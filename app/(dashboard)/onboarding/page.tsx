@@ -50,56 +50,29 @@ export default function OnboardingPage() {
     setError(null);
 
     try {
-      const supabase = createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      // Call the API route instead of Supabase directly
+      // This uses the service role to bypass RLS
+      const response = await fetch("/api/orgs", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
 
-      if (!user) {
-        setError("You must be logged in to create an organization");
+      const result = await response.json();
+
+      if (!response.ok) {
+        setError(result.error || "Failed to create organization");
         return;
       }
 
-      const slug = slugify(data.name);
-
-      // Create organization
-      const { data: org, error: orgError } = await supabase
-        .from("organizations")
-        .insert({
-          name: data.name,
-          slug,
-          tier: "free",
-          settings: {
-            industry: data.industry,
-            size: data.size,
-            location: data.location,
-          },
-        })
-        .select()
-        .single();
-
-      if (orgError) {
-        setError(orgError.message);
-        return;
-      }
-
-      // Add user as admin member
-      const { error: memberError } = await supabase
-        .from("organization_members")
-        .insert({
-          org_id: org.id,
-          user_id: user.id,
-          role: "admin",
-        });
-
-      if (memberError) {
-        setError(memberError.message);
-        return;
-      }
-
+      // Organization created successfully
+      const org = result.organization;
       router.push(`/${org.id}`);
       router.refresh();
     } catch (err) {
+      console.error("Organization creation error:", err);
       setError("Failed to create organization. Please try again.");
     } finally {
       setIsLoading(false);

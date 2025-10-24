@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { createClient as createServiceClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 import { createOrganizationSchema } from "@/lib/validations/org";
 import { slugify } from "@/lib/utils";
@@ -39,6 +40,7 @@ export async function GET() {
  */
 export async function POST(request: Request) {
   try {
+    // Use regular client for auth check
     const supabase = await createClient();
 
     const {
@@ -62,10 +64,33 @@ export async function POST(request: Request) {
     const data = validation.data;
     const slug = slugify(data.name);
 
-    // Create organization
-    // NOTE: The database trigger 'add_org_creator_trigger' automatically
-    // adds the creator as admin to organization_members table
-    const { data: org, error: orgError } = await supabase
+    // Use service role client to bypass RLS for org creation
+    // This is necessary because RLS policies can't check organization_members
+    // before the org exists
+    const supabaseAdmin = createServiceClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false,
+        },
+      }
+    );
+
+    // Verify we have a user ID
+    if (!user.id) {
+      console.error("No user ID available");
+      return NextResponse.json(
+        { error: "User authentication failed" },
+        { status: 401 }
+      );
+    }
+
+    console.log("Creating org for user:", user.id);
+
+    // Create organization with service role
+    const { data: org, error: orgError } = await supabaseAdmin
       .from("organizations")
       .insert({
         name: data.name,
@@ -81,16 +106,47 @@ export async function POST(request: Request) {
       .single();
 
     if (orgError) {
+      console.error("Organization creation error:", orgError);
       return NextResponse.json(
         { error: orgError.message },
         { status: 400 }
       );
     }
 
+    console.log("Organization created:", org.id);
+
+    // Add creator as admin (service role bypasses RLS)
+    // Explicitly pass user.id from the authenticated session
+    const { error: memberError } = await supabaseAdmin
+      .from("organization_members")
+      .insert({
+        org_id: org.id,
+        user_id: user.id, // Use the authenticated user's ID
+        role: "admin",
+        invited_by: user.id,
+      });
+
+    if (memberError) {
+      console.error("Member creation error:", memberError);
+      console.error("Attempted to insert:", {
+        org_id: org.id,
+        user_id: user.id,
+        role: "admin",
+      });
+      // If member creation fails, clean up the org
+      await supabaseAdmin.from("organizations").delete().eq("id", org.id);
+      return NextResponse.json(
+        { error: "Failed to set up organization membership: " + memberError.message },
+        { status: 500 }
+      );
+    }
+
+    console.log("Member added successfully");
+
     // Organization created successfully!
-    // The trigger has automatically added the user as admin
     return NextResponse.json({ organization: org }, { status: 201 });
   } catch (error) {
+    console.error("API error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
