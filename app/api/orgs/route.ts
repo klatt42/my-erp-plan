@@ -63,6 +63,8 @@ export async function POST(request: Request) {
     const slug = slugify(data.name);
 
     // Create organization
+    // NOTE: The database trigger 'add_org_creator_trigger' automatically
+    // adds the creator as admin to organization_members table
     const { data: org, error: orgError } = await supabase
       .from("organizations")
       .insert({
@@ -85,22 +87,8 @@ export async function POST(request: Request) {
       );
     }
 
-    // Add user as admin
-    const { error: memberError } = await supabase
-      .from("organization_members")
-      .insert({
-        org_id: org.id,
-        user_id: user.id,
-        role: "admin",
-      });
-
-    if (memberError) {
-      return NextResponse.json(
-        { error: memberError.message },
-        { status: 400 }
-      );
-    }
-
+    // Organization created successfully!
+    // The trigger has automatically added the user as admin
     return NextResponse.json({ organization: org }, { status: 201 });
   } catch (error) {
     return NextResponse.json(
