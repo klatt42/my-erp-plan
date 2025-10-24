@@ -10,7 +10,7 @@ import {
   Building2,
   Factory,
   ShoppingBag,
-  Warehouse,
+  Landmark,
   GraduationCap,
   Hotel,
   Server,
@@ -28,7 +28,7 @@ export type FacilityType =
   | "manufacturing"
   | "office"
   | "retail"
-  | "warehouse"
+  | "museum"
   | "educational"
   | "hospitality"
   | "datacenter"
@@ -68,10 +68,10 @@ const FACILITY_OPTIONS: FacilityOption[] = [
     icon: ShoppingBag,
   },
   {
-    value: "warehouse",
-    label: "Warehouse",
-    description: "Distribution, storage facilities",
-    icon: Warehouse,
+    value: "museum",
+    label: "Museum",
+    description: "Museums, galleries, archives",
+    icon: Landmark,
   },
   {
     value: "educational",
@@ -166,7 +166,7 @@ export function FacilityTypeSelector({
           </Label>
           <Input
             id="customType"
-            placeholder="e.g., Museum, Library, Community Center"
+            placeholder="e.g., Warehouse, Library, Community Center, Theater"
             value={customType || ""}
             onChange={(e) => onCustomTypeChange?.(e.target.value)}
           />

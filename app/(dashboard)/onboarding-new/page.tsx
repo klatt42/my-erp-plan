@@ -243,7 +243,7 @@ export default function OnboardingPage() {
             {currentStep === 2 && <Step2Content form={form} />}
 
             {/* Step 3: Collections/Assets */}
-            {currentStep === 3 && <Step3Content form={form} />}
+            {currentStep === 3 && <Step3Content form={form} allStepData={allStepData} />}
 
             {/* Step 4: Hazard Assessment */}
             {currentStep === 4 && <Step4Content form={form} allStepData={allStepData} />}

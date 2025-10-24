@@ -307,9 +307,103 @@ export function Step2Content({ form }: StepProps) {
 
 /**
  * Step 3: Collections/Assets
+ * Context-aware labels and placeholders based on facility type
  */
-export function Step3Content({ form }: StepProps) {
+export function Step3Content({ form, allStepData }: StepProps) {
   const hasCollections = form.watch("hasCollections");
+  const facilityType = allStepData?.step1?.type || "other";
+
+  // Context-aware content based on facility type
+  const getAssetContent = () => {
+    switch (facilityType) {
+      case "museum":
+        return {
+          checkboxLabel: "This museum has art collections, artifacts, or valuable exhibits",
+          description: "Describe your collections, artifacts, and exhibition pieces that require special protection.",
+          inventoryLabel: "Collection Value",
+          equipmentLabel: "Art Collections & Artifacts (one per line)",
+          equipmentPlaceholder: "e.g.,&#10;Renaissance paintings&#10;Ancient pottery&#10;Rare manuscripts&#10;Sculptures",
+          systemsLabel: "Environmental Control Systems (one per line)",
+          systemsPlaceholder: "e.g.,&#10;Climate control system&#10;Humidity monitors&#10;Security cameras&#10;Fire suppression",
+          dataLabel: "Critical Records & Archives (one per line)",
+          dataPlaceholder: "e.g.,&#10;Collection catalog&#10;Provenance records&#10;Conservation reports&#10;Exhibition schedules"
+        };
+      case "healthcare":
+        return {
+          checkboxLabel: "This facility has medical equipment, pharmaceuticals, or patient records",
+          description: "Describe medical equipment, pharmaceuticals, and critical patient care assets.",
+          inventoryLabel: "Medical Assets Value",
+          equipmentLabel: "Medical Equipment (one per line)",
+          equipmentPlaceholder: "e.g.,&#10;MRI machine&#10;Ventilators&#10;Surgical equipment&#10;Defibrillators",
+          systemsLabel: "Critical Healthcare Systems (one per line)",
+          systemsPlaceholder: "e.g.,&#10;HVAC with HEPA filtration&#10;Medical gas systems&#10;Nurse call system&#10;EMR system",
+          dataLabel: "Critical Patient Data (one per line)",
+          dataPlaceholder: "e.g.,&#10;Electronic medical records&#10;Patient charts&#10;Lab results database&#10;Medication records"
+        };
+      case "manufacturing":
+        return {
+          checkboxLabel: "This facility has critical production equipment or inventory",
+          description: "Describe production equipment, raw materials, and finished goods inventory.",
+          inventoryLabel: "Inventory & Equipment Value",
+          equipmentLabel: "Production Equipment (one per line)",
+          equipmentPlaceholder: "e.g.,&#10;CNC machines&#10;Assembly line robots&#10;Forklifts&#10;Quality control equipment",
+          systemsLabel: "Critical Production Systems (one per line)",
+          systemsPlaceholder: "e.g.,&#10;Compressed air system&#10;Electrical distribution&#10;HVAC system&#10;Conveyor systems",
+          dataLabel: "Critical Production Data (one per line)",
+          dataPlaceholder: "e.g.,&#10;Production schedules&#10;Quality control records&#10;Customer orders&#10;Inventory tracking"
+        };
+      case "datacenter":
+        return {
+          checkboxLabel: "This facility has servers, networking equipment, or critical infrastructure",
+          description: "Describe server hardware, networking equipment, and data storage systems.",
+          inventoryLabel: "IT Equipment Value",
+          equipmentLabel: "Critical IT Equipment (one per line)",
+          equipmentPlaceholder: "e.g.,&#10;Server racks&#10;Network switches&#10;Storage arrays&#10;Firewall appliances",
+          systemsLabel: "Infrastructure Systems (one per line)",
+          systemsPlaceholder: "e.g.,&#10;Cooling/HVAC system&#10;UPS batteries&#10;Backup generators&#10;Fire suppression",
+          dataLabel: "Critical Data & Services (one per line)",
+          dataPlaceholder: "e.g.,&#10;Customer databases&#10;Application servers&#10;Backup systems&#10;Network configuration"
+        };
+      case "retail":
+        return {
+          checkboxLabel: "This facility has merchandise inventory or point-of-sale systems",
+          description: "Describe merchandise, inventory, and retail equipment.",
+          inventoryLabel: "Merchandise Value",
+          equipmentLabel: "Retail Equipment (one per line)",
+          equipmentPlaceholder: "e.g.,&#10;Point-of-sale systems&#10;Cash registers&#10;Security cameras&#10;Display fixtures",
+          systemsLabel: "Store Systems (one per line)",
+          systemsPlaceholder: "e.g.,&#10;Inventory management system&#10;Security system&#10;HVAC system&#10;Payment processing",
+          dataLabel: "Critical Business Data (one per line)",
+          dataPlaceholder: "e.g.,&#10;Sales records&#10;Inventory database&#10;Customer loyalty data&#10;Financial transactions"
+        };
+      case "educational":
+        return {
+          checkboxLabel: "This facility has educational equipment, technology, or valuable resources",
+          description: "Describe educational technology, equipment, and learning resources.",
+          inventoryLabel: "Equipment & Resources Value",
+          equipmentLabel: "Educational Equipment (one per line)",
+          equipmentPlaceholder: "e.g.,&#10;Computer labs&#10;Science lab equipment&#10;Musical instruments&#10;Sports equipment",
+          systemsLabel: "Facility Systems (one per line)",
+          systemsPlaceholder: "e.g.,&#10;Network infrastructure&#10;Security/access control&#10;Audio-visual systems&#10;HVAC system",
+          dataLabel: "Critical Educational Data (one per line)",
+          dataPlaceholder: "e.g.,&#10;Student records&#10;Curriculum materials&#10;Library catalog&#10;Assessment data"
+        };
+      default:
+        return {
+          checkboxLabel: "This facility has valuable collections, inventory, or critical assets",
+          description: "Describe any valuable collections, inventory, or critical assets that require special protection during emergencies.",
+          inventoryLabel: "Overall Asset Value",
+          equipmentLabel: "Critical Equipment (one per line)",
+          equipmentPlaceholder: "e.g.,&#10;Essential machinery&#10;Specialized tools&#10;Technology systems",
+          systemsLabel: "Critical Systems (one per line)",
+          systemsPlaceholder: "e.g.,&#10;HVAC system&#10;Security system&#10;Communication system",
+          dataLabel: "Critical Data (one per line)",
+          dataPlaceholder: "e.g.,&#10;Business records&#10;Customer data&#10;Financial information"
+        };
+    }
+  };
+
+  const content = getAssetContent();
 
   return (
     <div className="space-y-6">
@@ -320,7 +414,7 @@ export function Step3Content({ form }: StepProps) {
           onCheckedChange={(checked) => form.setValue("hasCollections", !!checked)}
         />
         <label htmlFor="hasCollections" className="text-sm font-medium cursor-pointer">
-          This facility has valuable collections, inventory, or critical assets
+          {content.checkboxLabel}
         </label>
       </div>
 
@@ -328,12 +422,11 @@ export function Step3Content({ form }: StepProps) {
         <Card>
           <CardContent className="pt-6 space-y-4">
             <p className="text-sm text-muted-foreground">
-              Describe any valuable collections, inventory, or critical assets that require
-              special protection during emergencies.
+              {content.description}
             </p>
 
             <div className="space-y-2">
-              <Label htmlFor="inventoryValue">Overall Inventory Value</Label>
+              <Label htmlFor="inventoryValue">{content.inventoryLabel}</Label>
               <Select
                 value={form.watch("inventoryValue")}
                 onValueChange={(value) => form.setValue("inventoryValue", value)}
@@ -352,11 +445,11 @@ export function Step3Content({ form }: StepProps) {
 
             <div className="space-y-2">
               <Label htmlFor="criticalEquipment">
-                Critical Equipment (one per line)
+                {content.equipmentLabel}
               </Label>
               <Textarea
                 id="criticalEquipment"
-                placeholder="e.g.,&#10;MRI machine&#10;CNC mill&#10;Server racks"
+                placeholder={content.equipmentPlaceholder}
                 rows={4}
                 onChange={(e) => {
                   const items = e.target.value
@@ -369,10 +462,10 @@ export function Step3Content({ form }: StepProps) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="criticalSystems">Critical Systems (one per line)</Label>
+              <Label htmlFor="criticalSystems">{content.systemsLabel}</Label>
               <Textarea
                 id="criticalSystems"
-                placeholder="e.g.,&#10;HVAC system&#10;Security system&#10;Phone system"
+                placeholder={content.systemsPlaceholder}
                 rows={4}
                 onChange={(e) => {
                   const items = e.target.value
@@ -385,10 +478,10 @@ export function Step3Content({ form }: StepProps) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="criticalData">Critical Data (one per line)</Label>
+              <Label htmlFor="criticalData">{content.dataLabel}</Label>
               <Textarea
                 id="criticalData"
-                placeholder="e.g.,&#10;Customer database&#10;Financial records&#10;Research data"
+                placeholder={content.dataPlaceholder}
                 rows={4}
                 onChange={(e) => {
                   const items = e.target.value
@@ -492,23 +585,58 @@ export function Step4Content({ form, allStepData }: StepProps) {
 
 /**
  * Step 5: Team Structure
+ * Personnel breakdown for emergency response planning
  */
 export function Step5Content({ form }: StepProps) {
   return (
     <div className="space-y-6">
+      {/* Explanatory intro */}
+      <div className="p-4 bg-muted/50 rounded-md border">
+        <p className="text-sm text-muted-foreground">
+          This information helps us create appropriate emergency procedures, evacuation plans, and assign roles.
+          Categories help identify who needs specific emergency training, evacuation assistance, or accountability during incidents.
+        </p>
+      </div>
+
       {/* Personnel Counts */}
       <div>
         <Label className="mb-4 block">Personnel Breakdown</Label>
+        <p className="text-sm text-muted-foreground mb-4">
+          Estimate the number of people in each category. These numbers help determine evacuation time, assembly areas, and emergency team sizing.
+        </p>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {[
-            { key: "management", label: "Management" },
-            { key: "staff", label: "Staff" },
-            { key: "contractors", label: "Contractors" },
-            { key: "volunteers", label: "Volunteers" },
-            { key: "visitors", label: "Daily Visitors/Customers" },
-          ].map(({ key, label }) => (
+            {
+              key: "management",
+              label: "Management",
+              help: "Decision-makers & supervisors who will lead emergency response"
+            },
+            {
+              key: "staff",
+              label: "Staff",
+              help: "Full-time and part-time employees"
+            },
+            {
+              key: "contractors",
+              label: "Contractors/Vendors",
+              help: "Regular on-site contractors or vendors"
+            },
+            {
+              key: "volunteers",
+              label: "Volunteers",
+              help: "Volunteers or interns (if applicable)"
+            },
+            {
+              key: "visitors",
+              label: "Daily Visitors/Customers",
+              help: "Average number of visitors, customers, or guests per day"
+            },
+          ].map(({ key, label, help }) => (
             <div key={key} className="space-y-2">
-              <Label htmlFor={key}>{label}</Label>
+              <div>
+                <Label htmlFor={key}>{label}</Label>
+                <p className="text-xs text-muted-foreground mt-1">{help}</p>
+              </div>
               <Input
                 id={key}
                 type="number"

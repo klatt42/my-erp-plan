@@ -215,31 +215,43 @@ ${profile.customHazards ? profile.customHazards.map((h) => `- ${h}`).join("\n") 
 
 Generate a comprehensive ERP that prioritizes customer and employee safety in a public-facing environment.`,
 
-  warehouse: (profile) => `
-WAREHOUSE FACILITY EMERGENCY RESPONSE PLAN
+  museum: (profile) => `
+MUSEUM/GALLERY EMERGENCY RESPONSE PLAN
 
-Facility Type: Warehouse/Distribution/${profile.customType || "General"}
+Facility Type: Museum/${profile.customType || "Art Gallery/Archive"}
 Facility Name: ${profile.name}
 Size: ${profile.size} employees
 Location: ${profile.location.city}, ${profile.location.state}
 
-WAREHOUSE-SPECIFIC REQUIREMENTS:
-- Material handling equipment safety
-- Inventory and storage area evacuation
-- Forklift and vehicle operator procedures
-- Loading dock security and safety
-- Hazardous material storage (if applicable)
-- Large space evacuation procedures
-- Fire suppression in high-bay areas
-- Coordination with delivery/shipping personnel
+MUSEUM-SPECIFIC REQUIREMENTS:
+- Art collection and artifact protection
+- Climate-controlled environment maintenance
+- Visitor safety and evacuation (including school groups)
+- Security system integration with emergency procedures
+- Irreplaceable item salvage priorities
+- Conservation and restoration considerations
+- Exhibition space and storage area protocols
+- Coordination with cultural heritage authorities
+- Fire suppression for valuable collections (special systems)
+- Water damage prevention and mitigation
 
-FACILITY CHARACTERISTICS:${profile.infrastructure?.squareFootage ? `\n- ${profile.infrastructure.squareFootage} sq ft` : ""}${profile.infrastructure?.hasSprinklers ? "\n- Sprinkler system installed" : ""}${profile.collections ? `\n- Inventory types: ${profile.collections.map((c) => c.type).join(", ")}` : ""}
+COLLECTION DETAILS:${
+    profile.collections
+      ? `\n- Collection types: ${profile.collections.map((c) => c.type).join(", ")}\n- Collection value: ${profile.collections[0]?.value || "Not specified"}`
+      : "\n- No specific collection details provided"
+  }${profile.infrastructure?.squareFootage ? `\n- Exhibition space: ${profile.infrastructure.squareFootage} sq ft` : ""}${profile.infrastructure?.hasSprinklers ? "\n- Fire suppression system installed" : ""}
+
+VISITOR CONSIDERATIONS:${
+    profile.personnel?.visitors
+      ? `\n- Average daily visitors: ${profile.personnel.visitors}`
+      : ""
+  }${profile.multilingualNeeds ? `\n- Languages needed: ${profile.multilingualNeeds.join(", ")}` : ""}
 
 HAZARDS AND RISKS:
 ${profile.hazards.map((h) => `- ${h.replace(/_/g, " ").toUpperCase()}`).join("\n")}
 ${profile.customHazards ? profile.customHazards.map((h) => `- ${h}`).join("\n") : ""}
 
-Generate a comprehensive ERP for warehouse operations with emphasis on material handling safety and inventory protection.`,
+Generate a comprehensive ERP focused on protecting irreplaceable cultural assets while ensuring visitor and staff safety.`,
 
   educational: (profile) => `
 EDUCATIONAL FACILITY EMERGENCY RESPONSE PLAN

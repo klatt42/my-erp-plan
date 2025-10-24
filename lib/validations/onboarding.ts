@@ -18,7 +18,7 @@ export const organizationInfoSchema = z.object({
     "manufacturing",
     "office",
     "retail",
-    "warehouse",
+    "museum",
     "educational",
     "hospitality",
     "datacenter",

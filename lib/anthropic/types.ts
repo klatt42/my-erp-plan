@@ -11,7 +11,7 @@ export type FacilityType =
   | "manufacturing"
   | "office"
   | "retail"
-  | "warehouse"
+  | "museum"
   | "educational"
   | "hospitality"
   | "datacenter"
