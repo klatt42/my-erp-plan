@@ -57,3 +57,35 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Table styling for markdown content */
+@layer components {
+  .prose table {
+    @apply w-full border-collapse;
+    border-spacing: 0;
+  }
+
+  .prose th {
+    @apply border border-border bg-muted px-4 py-2 text-left font-semibold;
+  }
+
+  .prose td {
+    @apply border border-border px-4 py-2;
+  }
+
+  .prose thead tr {
+    @apply border-b-2 border-border;
+  }
+
+  .prose tbody tr {
+    @apply border-b border-border;
+  }
+
+  .prose tbody tr:last-child {
+    @apply border-b-0;
+  }
+
+  .prose tbody tr:hover {
+    @apply bg-muted/50;
+  }
+}

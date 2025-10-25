@@ -47,7 +47,20 @@ export function LoginForm() {
         return;
       }
 
-      router.push("/dashboard");
+      // Check if user has an organization
+      const { data: memberships } = await supabase
+        .from("organization_members")
+        .select("org_id")
+        .limit(1)
+        .single();
+
+      if (memberships?.org_id) {
+        // Returning user with organization - go to dashboard
+        router.push(`/${memberships.org_id}`);
+      } else {
+        // New user - go to onboarding
+        router.push("/onboarding");
+      }
       router.refresh();
     } catch (err) {
       setError("An unexpected error occurred. Please try again.");
