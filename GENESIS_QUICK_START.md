@@ -24,6 +24,20 @@ npm run dev
 # Open http://localhost:3000
 ```
 
+## 🔄 Terminal Restart (After PC Reboot)
+
+```bash
+# Quick restart for existing developers
+cd ~/projects/genesis-skills-test/my-erp-plan
+./restart-project.sh
+
+# This script will:
+# - Check git status
+# - Show current branch
+# - Display TAB 1 and TAB 2 setup instructions
+# - Provide context recovery prompt for Claude Code
+```
+
 ## 📋 Required Credentials
 
 ```bash
@@ -169,22 +183,28 @@ See: **GENESIS_SKILLS_GUIDE.md** for detailed invocation patterns
 
 ## 🚦 Current Status
 
-**Phase**: 1 Complete ✅ | Phase 2 Ready 🚀
+**Phase**: Phase 2 Week 2 Complete ✅ | Phase 2 Week 3 Ready 🚀
 
 **What Works**:
-- Authentication (signup, login, email verification)
-- Organization creation and management
-- Dashboard with navigation
-- Protected routes and middleware
-- Multi-tenant database with RLS
-- API routes for organizations and plans
+- ✅ Authentication (signup, login, email verification)
+- ✅ Organization creation and management
+- ✅ Dashboard with navigation
+- ✅ Protected routes and middleware
+- ✅ Multi-tenant database with RLS
+- ✅ API routes for organizations and plans
+- ✅ AI-powered ERP generation with Claude 4
+- ✅ Multi-step onboarding questionnaire (6 steps)
+- ✅ Plan display with markdown rendering
+- 🚧 PDF export functionality (in progress)
+- 🚧 Plan versioning (in progress)
+- 🚧 Quick plan creation (in progress)
 
-**Next Steps** (Phase 2):
-- AI-powered ERP generation with Claude
-- Onboarding questionnaire for facility info
-- Emergency plan editor
-- PDF export functionality
+**Next Steps** (Phase 2 Week 3):
+- Complete and test PDF export
+- Complete plan versioning system
+- Add plan activation workflow
 - Resource management (personnel, equipment, facilities)
+- Emergency mode features
 
 ## 🔗 Quick Links
 
@@ -210,6 +230,7 @@ See: **GENESIS_SKILLS_GUIDE.md** for detailed invocation patterns
 
 ---
 
-**Last Updated**: October 24, 2025
-**Phase**: 1 Complete - Ready for Phase 2 Development
+**Last Updated**: October 25, 2025 (After PC Reboot - Terminal Restarted)
+**Phase**: Phase 2 Week 2 Complete - Ready for Phase 2 Week 3
 **Generated with**: Genesis patterns + Claude Code
+**Restart Script**: `./restart-project.sh` available for quick terminal recovery

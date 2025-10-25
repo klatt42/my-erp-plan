@@ -2,6 +2,15 @@
 
 AI-powered Emergency Response Planning SaaS platform. Generate, manage, and maintain comprehensive emergency response plans using Claude AI.
 
+## 🔄 Quick Restart (After PC Reboot)
+
+```bash
+cd ~/projects/genesis-skills-test/my-erp-plan
+./restart-project.sh
+```
+
+This will guide you through terminal setup and provide Claude Code context recovery instructions.
+
 ## Features
 
 - Multi-tenant SaaS architecture with organization-based isolation
