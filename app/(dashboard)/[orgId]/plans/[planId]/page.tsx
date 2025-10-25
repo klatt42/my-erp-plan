@@ -6,6 +6,12 @@ import Link from "next/link";
 import { formatDate } from "@/lib/utils";
 import { Edit, Download, FileText } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { DeletePlanButton } from "@/components/plans/DeletePlanButton";
+import { ExportPdfButton } from "@/components/plans/ExportPdfButton";
+import { ActivatePlanButton } from "@/components/plans/ActivatePlanButton";
+import { CreateVersionButton } from "@/components/plans/CreateVersionButton";
+import { SectionNavigation } from "@/components/plans/SectionNavigation";
 
 interface ERPSection {
   title: string;
@@ -37,6 +43,11 @@ export default async function PlanDetailPage({
 }) {
   const supabase = await createClient();
 
+  // Get authenticated user
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   const { data: plan } = await supabase
     .from("emergency_plans")
     .select("*")
@@ -47,6 +58,17 @@ export default async function PlanDetailPage({
   if (!plan) {
     notFound();
   }
+
+  // Get user's role in the organization
+  const { data: membership } = await supabase
+    .from("organization_members")
+    .select("role")
+    .eq("org_id", params.orgId)
+    .eq("user_id", user?.id)
+    .single();
+
+  const userRole = membership?.role || "viewer";
+  const isAdmin = userRole === "admin";
 
   const content = (plan.content_json as PlanContent) || {};
   const hasSections = content.sections && content.sections.length > 0;
@@ -72,10 +94,7 @@ export default async function PlanDetailPage({
           </div>
         </div>
         <div className="flex space-x-2">
-          <Button variant="outline" size="sm">
-            <Download className="mr-2 h-4 w-4" />
-            Export PDF
-          </Button>
+          <ExportPdfButton planId={params.planId} planName={content.facilityName} />
           {plan.status === "draft" && (
             <Button asChild size="sm">
               <Link href={`/${params.orgId}/plans/${params.planId}/edit`}>
@@ -83,6 +102,21 @@ export default async function PlanDetailPage({
                 Edit
               </Link>
             </Button>
+          )}
+          {(plan.status === "active" || plan.status === "archived") && (
+            <CreateVersionButton
+              planId={params.planId}
+              orgId={params.orgId}
+              planName={content.facilityName}
+              currentVersion={content.version || plan.version}
+            />
+          )}
+          {isAdmin && (
+            <DeletePlanButton
+              planId={params.planId}
+              orgId={params.orgId}
+              planName={content.facilityName}
+            />
           )}
         </div>
       </div>
@@ -109,18 +143,18 @@ export default async function PlanDetailPage({
                 </div>
               )}
             </div>
-            {plan.status === "draft" && (
-              <Button variant="default" size="sm">
-                Activate Plan
-              </Button>
-            )}
+            <ActivatePlanButton
+              planId={params.planId}
+              planName={content.facilityName}
+              currentStatus={plan.status}
+            />
           </div>
         </CardContent>
       </Card>
 
       {/* Executive Summary */}
       {content.executiveSummary && (
-        <Card>
+        <Card id="section-executive-summary">
           <CardHeader>
             <CardTitle className="flex items-center">
               <FileText className="mr-2 h-5 w-5" />
@@ -128,8 +162,8 @@ export default async function PlanDetailPage({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="prose prose-sm max-w-none dark:prose-invert">
-              <ReactMarkdown>{content.executiveSummary}</ReactMarkdown>
+            <div className="prose prose-sm max-w-none dark:prose-invert prose-table:text-sm">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{content.executiveSummary}</ReactMarkdown>
             </div>
           </CardContent>
         </Card>
@@ -139,13 +173,13 @@ export default async function PlanDetailPage({
       {hasSections ? (
         <div className="space-y-6">
           {content.sections!.map((section, index) => (
-            <Card key={index}>
+            <Card key={index} id={`section-${index}`}>
               <CardHeader>
                 <CardTitle>{section.title}</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="prose prose-sm max-w-none dark:prose-invert">
-                  <ReactMarkdown>{section.content}</ReactMarkdown>
+                <div className="prose prose-sm max-w-none dark:prose-invert prose-table:text-sm">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{section.content}</ReactMarkdown>
 
                   {section.subsections && section.subsections.length > 0 && (
                     <div className="mt-6 space-y-4 pl-4 border-l-2 border-gray-200 dark:border-gray-700">
@@ -154,7 +188,7 @@ export default async function PlanDetailPage({
                           <h4 className="font-semibold text-base mb-2">
                             {subsection.title}
                           </h4>
-                          <ReactMarkdown>{subsection.content}</ReactMarkdown>
+                          <ReactMarkdown remarkPlugins={[remarkGfm]}>{subsection.content}</ReactMarkdown>
                         </div>
                       ))}
                     </div>
@@ -192,6 +226,14 @@ export default async function PlanDetailPage({
             </div>
           </CardContent>
         </Card>
+      )}
+
+      {/* Mobile Navigation */}
+      {hasSections && (
+        <SectionNavigation
+          sections={content.sections!}
+          executiveSummary={content.executiveSummary}
+        />
       )}
     </div>
   );
