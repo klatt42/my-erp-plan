@@ -91,15 +91,15 @@
 
   /* Section headers */
   .prose h2 {
-    @apply bg-gradient-to-r from-primary/10 to-primary/5 border-l-4 border-primary px-4 py-3 rounded-r-md mt-8 mb-4;
+    @apply bg-gradient-to-r from-primary/20 to-primary/10 border-l-4 border-primary px-4 py-3 rounded-r-md mt-8 mb-4;
   }
 
   .prose h3 {
-    @apply bg-gradient-to-r from-muted to-transparent border-l-2 border-primary/60 px-3 py-2 rounded-r-md mt-6 mb-3;
+    @apply bg-gradient-to-r from-primary/15 to-primary/5 border-l-2 border-primary/60 px-3 py-2 rounded-r-md mt-6 mb-3;
   }
 
   .prose h4 {
-    @apply bg-muted/50 border-l-2 border-primary/40 px-3 py-1.5 rounded-r-sm mt-4 mb-2;
+    @apply bg-primary/10 border-l-2 border-primary/40 px-3 py-1.5 rounded-r-sm mt-4 mb-2;
   }
 
   /* Improve heading text appearance */
