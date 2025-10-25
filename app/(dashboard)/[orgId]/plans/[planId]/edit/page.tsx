@@ -126,6 +126,40 @@ export default function EditPlanPage() {
     setContent({ ...content, sections });
   };
 
+  const updateSubsection = (
+    sectionIndex: number,
+    subsectionIndex: number,
+    field: "title" | "content",
+    value: string
+  ) => {
+    const sections = [...(content.sections || [])];
+    const subsections = [...(sections[sectionIndex].subsections || [])];
+    subsections[subsectionIndex] = { ...subsections[subsectionIndex], [field]: value };
+    sections[sectionIndex] = { ...sections[sectionIndex], subsections };
+    setContent({ ...content, sections });
+  };
+
+  const addSubsection = (sectionIndex: number) => {
+    const sections = [...(content.sections || [])];
+    const subsections = [...(sections[sectionIndex].subsections || [])];
+    subsections.push({
+      title: "New Subsection",
+      content: "Enter subsection content here...",
+    });
+    sections[sectionIndex] = { ...sections[sectionIndex], subsections };
+    setContent({ ...content, sections });
+  };
+
+  const deleteSubsection = (sectionIndex: number, subsectionIndex: number) => {
+    if (!confirm("Are you sure you want to delete this subsection?")) return;
+
+    const sections = [...(content.sections || [])];
+    const subsections = [...(sections[sectionIndex].subsections || [])];
+    subsections.splice(subsectionIndex, 1);
+    sections[sectionIndex] = { ...sections[sectionIndex], subsections };
+    setContent({ ...content, sections });
+  };
+
   const moveSection = (index: number, direction: "up" | "down") => {
     const sections = [...(content.sections || [])];
     const newIndex = direction === "up" ? index - 1 : index + 1;
@@ -374,6 +408,74 @@ export default function EditPlanPage() {
                         Supports markdown formatting including tables
                       </p>
                     </div>
+
+                    {/* Subsections */}
+                    <div className="space-y-3 border-l-2 border-gray-200 dark:border-gray-700 pl-4">
+                      <div className="flex items-center justify-between">
+                        <Label className="text-sm font-semibold">Subsections</Label>
+                        <Button
+                          onClick={() => addSubsection(index)}
+                          variant="outline"
+                          size="sm"
+                        >
+                          <Plus className="mr-1 h-3 w-3" />
+                          Add Subsection
+                        </Button>
+                      </div>
+
+                      {section.subsections?.map((subsection, subIndex) => (
+                        <Card key={subIndex} className="bg-muted/50">
+                          <CardContent className="pt-4 space-y-3">
+                            <div className="flex items-center justify-between">
+                              <Label className="text-xs text-muted-foreground">
+                                Subsection {subIndex + 1}
+                              </Label>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => deleteSubsection(index, subIndex)}
+                              >
+                                <Trash2 className="h-3 w-3 text-destructive" />
+                              </Button>
+                            </div>
+                            <div>
+                              <Label htmlFor={`subsection-title-${index}-${subIndex}`} className="text-xs">
+                                Subsection Title
+                              </Label>
+                              <Input
+                                id={`subsection-title-${index}-${subIndex}`}
+                                value={subsection.title}
+                                onChange={(e) =>
+                                  updateSubsection(index, subIndex, "title", e.target.value)
+                                }
+                                className="mt-1"
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor={`subsection-content-${index}-${subIndex}`} className="text-xs">
+                                Subsection Content
+                              </Label>
+                              <Textarea
+                                id={`subsection-content-${index}-${subIndex}`}
+                                value={subsection.content}
+                                onChange={(e) =>
+                                  updateSubsection(index, subIndex, "content", e.target.value)
+                                }
+                                rows={6}
+                                className="font-mono text-sm mt-1"
+                                placeholder="Enter subsection content..."
+                              />
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+
+                      {(!section.subsections || section.subsections.length === 0) && (
+                        <p className="text-xs text-muted-foreground italic">
+                          No subsections. Click "Add Subsection" to create one.
+                        </p>
+                      )}
+                    </div>
                   </CardContent>
                 )}
               </Card>
@@ -423,6 +525,21 @@ export default function EditPlanPage() {
                       <ReactMarkdown remarkPlugins={[remarkGfm]}>
                         {section.content}
                       </ReactMarkdown>
+
+                      {section.subsections && section.subsections.length > 0 && (
+                        <div className="mt-6 space-y-4 pl-4 border-l-2 border-gray-200 dark:border-gray-700">
+                          {section.subsections.map((subsection, subIndex) => (
+                            <div key={subIndex}>
+                              <h4 className="font-semibold text-base mb-2">
+                                {subsection.title}
+                              </h4>
+                              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                {subsection.content}
+                              </ReactMarkdown>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
