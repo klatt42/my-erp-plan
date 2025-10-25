@@ -30,7 +30,7 @@ export function Sidebar({ orgId }: SidebarProps) {
   const pathname = usePathname();
 
   return (
-    <div className="flex h-full w-64 flex-col border-r bg-muted/10">
+    <div className="hidden md:flex h-full w-64 flex-col border-r bg-muted/10">
       <div className="flex h-16 items-center px-6">
         <Link href={`/${orgId}`} className="flex items-center space-x-2">
           <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
