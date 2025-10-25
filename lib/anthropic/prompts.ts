@@ -414,8 +414,8 @@ ${profile.multilingualNeeds && profile.multilingualNeeds.length > 0 ? `MULTILING
 
 ${(profile as any).emergencyContacts ? `PRE-DESIGNATED EMERGENCY SERVICE PROVIDERS:
 Include these pre-designated contractors in the Emergency Contact Information section under "Support Services":
-${(profile as any).emergencyContacts.mitigationContractor ? `- Mitigation Contractor: ${(profile as any).emergencyContacts.mitigationContractor}${(profile as any).emergencyContacts.mitigationContractorPhone ? ` | Phone: ${(profile as any).emergencyContacts.mitigationContractorPhone}` : ""}` : "- Mitigation Contractor: [To be determined]"}
-${(profile as any).emergencyContacts.specialtyContentsContractor ? `- Specialty Contents Contractor: ${(profile as any).emergencyContacts.specialtyContentsContractor}${(profile as any).emergencyContacts.specialtyContentsContractorPhone ? ` | Phone: ${(profile as any).emergencyContacts.specialtyContentsContractorPhone}` : ""}` : "- Specialty Contents Contractor: [To be determined]"}` : ""}`;
+${(profile as any).emergencyContacts.mitigationContractor ? `- Mitigation Contractor: ${(profile as any).emergencyContacts.mitigationContractor}${(profile as any).emergencyContacts.mitigationContractorPhone ? ` | Phone: ${(profile as any).emergencyContacts.mitigationContractorPhone}` : ""}${(profile as any).emergencyContacts.mitigationContractorContact ? ` | Contact: ${(profile as any).emergencyContacts.mitigationContractorContact}` : ""}` : "- Mitigation Contractor: [To be determined]"}
+${(profile as any).emergencyContacts.specialtyContentsContractor ? `- Specialty Contents Contractor: ${(profile as any).emergencyContacts.specialtyContentsContractor}${(profile as any).emergencyContacts.specialtyContentsContractorPhone ? ` | Phone: ${(profile as any).emergencyContacts.specialtyContentsContractorPhone}` : ""}${(profile as any).emergencyContacts.specialtyContentsContractorContact ? ` | Contact: ${(profile as any).emergencyContacts.specialtyContentsContractorContact}` : ""}` : "- Specialty Contents Contractor: [To be determined]"}` : ""}`;
 }
 
 /**

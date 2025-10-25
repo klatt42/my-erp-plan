@@ -163,7 +163,7 @@ export const teamStructureSchema = z.object({
 export type TeamStructure = z.infer<typeof teamStructureSchema>;
 
 /**
- * Step 6: Compliance Needs
+ * Step 6: Compliance Needs & Emergency Contacts
  */
 export const complianceNeedsSchema = z.object({
   compliance: z
@@ -186,6 +186,13 @@ export const complianceNeedsSchema = z.object({
   auditSchedule: z
     .enum(["monthly", "quarterly", "annually", "as_needed"])
     .optional(),
+  // Emergency Contacts - Support Services
+  mitigationContractor: z.string().optional(),
+  mitigationContractorPhone: z.string().optional(),
+  mitigationContractorContact: z.string().optional(),
+  specialtyContentsContractor: z.string().optional(),
+  specialtyContentsContractorPhone: z.string().optional(),
+  specialtyContentsContractorContact: z.string().optional(),
 });
 
 export type ComplianceNeeds = z.infer<typeof complianceNeedsSchema>;
@@ -337,5 +344,13 @@ export function onboardingToFacilityProfile(
     specialConsiderations: data.step5.specialConsiderations,
     compliance: data.step6.compliance,
     customCompliance: data.step6.customCompliance,
+    emergencyContacts: {
+      mitigationContractor: data.step6.mitigationContractor,
+      mitigationContractorPhone: data.step6.mitigationContractorPhone,
+      mitigationContractorContact: data.step6.mitigationContractorContact,
+      specialtyContentsContractor: data.step6.specialtyContentsContractor,
+      specialtyContentsContractorPhone: data.step6.specialtyContentsContractorPhone,
+      specialtyContentsContractorContact: data.step6.specialtyContentsContractorContact,
+    },
   };
 }

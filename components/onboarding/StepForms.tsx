@@ -778,11 +778,23 @@ export function Step6Content({ form }: StepProps) {
             >
               <CardContent className="p-4">
                 <div className="flex items-start space-x-3">
-                  <Checkbox
-                    checked={selectedCompliance.includes(option.value)}
-                    onCheckedChange={() => toggleCompliance(option.value)}
-                    onClick={(e) => e.stopPropagation()}
-                  />
+                  <div className={`h-4 w-4 rounded border-2 flex-shrink-0 mt-0.5 transition-colors ${
+                    selectedCompliance.includes(option.value)
+                      ? "bg-primary border-primary"
+                      : "border-muted-foreground/30"
+                  }`}>
+                    {selectedCompliance.includes(option.value) && (
+                      <svg
+                        className="h-full w-full text-primary-foreground"
+                        viewBox="0 0 16 16"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="3"
+                      >
+                        <polyline points="3,8 6,11 13,4" />
+                      </svg>
+                    )}
+                  </div>
                   <div className="flex-1">
                     <div className="font-medium">{option.label}</div>
                     <div className="text-sm text-muted-foreground">
@@ -836,6 +848,78 @@ export function Step6Content({ form }: StepProps) {
         <label htmlFor="insuranceRequirements" className="text-sm cursor-pointer">
           Insurance company requires emergency plan documentation
         </label>
+      </div>
+
+      {/* Emergency Contacts - Support Services */}
+      <div className="space-y-4 pt-6 border-t">
+        <div>
+          <Label className="text-lg font-medium">Emergency Support Services</Label>
+          <p className="text-sm text-muted-foreground mt-1">
+            Pre-designated contractors for emergency response and recovery
+          </p>
+        </div>
+
+        {/* Mitigation Contractor */}
+        <div className="space-y-4 p-4 bg-muted/30 rounded-md">
+          <h4 className="font-medium">Mitigation Contractor</h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="mitigationContractor">Company Name</Label>
+              <Input
+                id="mitigationContractor"
+                {...form.register("mitigationContractor")}
+                placeholder="e.g., Prism Specialties"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="mitigationContractorPhone">Phone Number</Label>
+              <Input
+                id="mitigationContractorPhone"
+                {...form.register("mitigationContractorPhone")}
+                placeholder="e.g., 301-955-0885"
+              />
+            </div>
+            <div className="space-y-2 md:col-span-2">
+              <Label htmlFor="mitigationContractorContact">Primary Contact Person</Label>
+              <Input
+                id="mitigationContractorContact"
+                {...form.register("mitigationContractorContact")}
+                placeholder="e.g., John Smith"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Specialty Contents Contractor */}
+        <div className="space-y-4 p-4 bg-muted/30 rounded-md">
+          <h4 className="font-medium">Specialty Contents Contractor</h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="specialtyContentsContractor">Company Name</Label>
+              <Input
+                id="specialtyContentsContractor"
+                {...form.register("specialtyContentsContractor")}
+                defaultValue="Prism Specialties of DC, MD, and VA Metro"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="specialtyContentsContractorPhone">Phone Number</Label>
+              <Input
+                id="specialtyContentsContractorPhone"
+                {...form.register("specialtyContentsContractorPhone")}
+                defaultValue="301-955-0885"
+              />
+            </div>
+            <div className="space-y-2 md:col-span-2">
+              <Label htmlFor="specialtyContentsContractorContact">Primary Contact Person</Label>
+              <Input
+                id="specialtyContentsContractorContact"
+                {...form.register("specialtyContentsContractorContact")}
+                defaultValue="Mike Cioffi"
+              />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
