@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { formatDate } from "@/lib/utils";
-import { Edit, Download, FileText } from "lucide-react";
+import { Edit, Download, FileText, AlertTriangle } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { DeletePlanButton } from "@/components/plans/DeletePlanButton";
@@ -12,6 +12,7 @@ import { ExportPdfButton } from "@/components/plans/ExportPdfButton";
 import { ActivatePlanButton } from "@/components/plans/ActivatePlanButton";
 import { CreateVersionButton } from "@/components/plans/CreateVersionButton";
 import { SectionNavigation } from "@/components/plans/SectionNavigation";
+import { SelectiveExportMenu } from "@/components/plans/SelectiveExportMenu";
 
 interface ERPSection {
   title: string;
@@ -94,6 +95,13 @@ export default async function PlanDetailPage({
           </div>
         </div>
         <div className="flex space-x-2">
+          {hasSections && (
+            <SelectiveExportMenu
+              planId={params.planId}
+              sections={content.sections!}
+              facilityName={content.facilityName}
+            />
+          )}
           <ExportPdfButton planId={params.planId} planName={content.facilityName} />
           {plan.status === "draft" && (
             <Button asChild size="sm">
@@ -121,10 +129,10 @@ export default async function PlanDetailPage({
         </div>
       </div>
 
-      {/* Status */}
+      {/* Status and Emergency Mode */}
       <Card>
         <CardContent className="pt-6">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center space-x-4">
               <div
                 className={`px-3 py-1 rounded-full text-sm font-medium ${
@@ -143,11 +151,21 @@ export default async function PlanDetailPage({
                 </div>
               )}
             </div>
-            <ActivatePlanButton
-              planId={params.planId}
-              planName={content.facilityName}
-              currentStatus={plan.status}
-            />
+            <div className="flex items-center gap-2">
+              {plan.status === "active" && (
+                <Button asChild variant="destructive" size="sm">
+                  <Link href={`/${params.orgId}/plans/${params.planId}/emergency-mode`}>
+                    <AlertTriangle className="mr-2 h-4 w-4" />
+                    Emergency Mode
+                  </Link>
+                </Button>
+              )}
+              <ActivatePlanButton
+                planId={params.planId}
+                planName={content.facilityName}
+                currentStatus={plan.status}
+              />
+            </div>
           </div>
         </CardContent>
       </Card>
