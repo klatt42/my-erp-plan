@@ -8,7 +8,7 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2, ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -41,7 +41,10 @@ const STORAGE_KEY = "onboarding_progress";
 
 export default function OnboardingPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { toast } = useToast();
+
+  const orgId = searchParams.get("orgId");
 
   const [currentStep, setCurrentStep] = useState(1);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
@@ -79,7 +82,7 @@ export default function OnboardingPage() {
   }, [allStepData, currentStep, completedSteps]);
 
   const form = useForm({
-    resolver: zodResolver(getStepSchema(currentStep)),
+    resolver: zodResolver(getStepSchema(currentStep) as any),
     defaultValues: getStepDefaults(currentStep),
   });
 
@@ -164,7 +167,7 @@ export default function OnboardingPage() {
       const response = await fetch("/api/plans/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ facilityProfile }),
+        body: JSON.stringify({ facilityProfile, orgId }),
       });
 
       if (!response.ok) {

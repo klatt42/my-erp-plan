@@ -33,7 +33,10 @@ export async function POST(request: Request) {
 
     // Parse request body
     const body = await request.json();
-    const { facilityProfile } = body as { facilityProfile: FacilityProfile };
+    const { facilityProfile, orgId: requestedOrgId } = body as {
+      facilityProfile: FacilityProfile;
+      orgId?: string;
+    };
 
     if (!facilityProfile) {
       return NextResponse.json(
@@ -44,23 +47,47 @@ export async function POST(request: Request) {
 
     console.log(`[/api/plans/generate] Generating ERP for: ${facilityProfile.name} (${facilityProfile.type})`);
 
-    // Get user's organization (use first org for now, or from request)
-    const { data: memberships, error: membershipError } = await supabase
-      .from("organization_members")
-      .select("org_id, organizations(name)")
-      .eq("user_id", user.id)
-      .limit(1);
+    // Determine organization ID (use requested orgId if provided, otherwise fall back to first org)
+    let orgId: string;
 
-    if (membershipError || !memberships || memberships.length === 0) {
-      console.error("[/api/plans/generate] No organization found for user");
-      return NextResponse.json(
-        { error: "No organization found. Please create an organization first." },
-        { status: 400 }
-      );
+    if (requestedOrgId) {
+      // Verify user has access to the requested organization
+      const { data: membership, error: membershipError } = await supabase
+        .from("organization_members")
+        .select("org_id")
+        .eq("user_id", user.id)
+        .eq("org_id", requestedOrgId)
+        .single();
+
+      if (membershipError || !membership) {
+        console.error("[/api/plans/generate] User does not have access to requested organization");
+        return NextResponse.json(
+          { error: "You do not have access to this organization" },
+          { status: 403 }
+        );
+      }
+
+      orgId = requestedOrgId;
+      console.log(`[/api/plans/generate] Using requested organization: ${orgId}`);
+    } else {
+      // Fallback: get user's first organization
+      const { data: memberships, error: membershipError } = await supabase
+        .from("organization_members")
+        .select("org_id, organizations(name)")
+        .eq("user_id", user.id)
+        .limit(1);
+
+      if (membershipError || !memberships || memberships.length === 0) {
+        console.error("[/api/plans/generate] No organization found for user");
+        return NextResponse.json(
+          { error: "No organization found. Please create an organization first." },
+          { status: 400 }
+        );
+      }
+
+      orgId = memberships[0].org_id;
+      console.log(`[/api/plans/generate] Using first organization (fallback): ${orgId}`);
     }
-
-    const orgId = memberships[0].org_id;
-    console.log(`[/api/plans/generate] Using organization: ${orgId}`);
 
     // Generate ERP using Claude 4
     console.log("[/api/plans/generate] Calling generateERP()...");
@@ -93,7 +120,7 @@ export async function POST(request: Request) {
     const serviceSupabase = createServerClient();
 
     // Create the emergency plan in the database
-    const { data: plan, error: createError } = await serviceSupabase
+    const planResult = await serviceSupabase
       .from("emergency_plans")
       .insert({
         org_id: orgId,
@@ -112,6 +139,8 @@ export async function POST(request: Request) {
       })
       .select()
       .single();
+
+    const { data: plan, error: createError } = planResult as { data: any; error: any };
 
     if (createError) {
       console.error("[/api/plans/generate] Database insert error:", createError);

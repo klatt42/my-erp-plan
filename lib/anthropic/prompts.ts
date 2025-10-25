@@ -410,7 +410,12 @@ ${compliancePrompts}
 ACCESSIBILITY REQUIREMENTS:
 ${profile.accessibilityNeeds ? "- Ensure all procedures accommodate individuals with disabilities\n- Include visual, auditory, and mobility considerations\n- Specify assistance protocols for evacuation" : "- Standard accessibility considerations apply"}
 
-${profile.multilingualNeeds && profile.multilingualNeeds.length > 0 ? `MULTILINGUAL REQUIREMENTS:\n- Plan must be available in: ${profile.multilingualNeeds.join(", ")}\n- Consider language barriers in emergency communication` : ""}`;
+${profile.multilingualNeeds && profile.multilingualNeeds.length > 0 ? `MULTILINGUAL REQUIREMENTS:\n- Plan must be available in: ${profile.multilingualNeeds.join(", ")}\n- Consider language barriers in emergency communication` : ""}
+
+${(profile as any).emergencyContacts ? `PRE-DESIGNATED EMERGENCY SERVICE PROVIDERS:
+Include these pre-designated contractors in the Emergency Contact Information section under "Support Services":
+${(profile as any).emergencyContacts.mitigationContractor ? `- Mitigation Contractor: ${(profile as any).emergencyContacts.mitigationContractor}${(profile as any).emergencyContacts.mitigationContractorPhone ? ` | Phone: ${(profile as any).emergencyContacts.mitigationContractorPhone}` : ""}` : "- Mitigation Contractor: [To be determined]"}
+${(profile as any).emergencyContacts.specialtyContentsContractor ? `- Specialty Contents Contractor: ${(profile as any).emergencyContacts.specialtyContentsContractor}${(profile as any).emergencyContacts.specialtyContentsContractorPhone ? ` | Phone: ${(profile as any).emergencyContacts.specialtyContentsContractorPhone}` : ""}` : "- Specialty Contents Contractor: [To be determined]"}` : ""}`;
 }
 
 /**
@@ -434,6 +439,43 @@ REQUIRED SECTIONS:
 8. Resource Management
 9. Training and Drills
 10. Plan Maintenance and Updates
+
+SECTION 3 FORMAT REQUIREMENTS - Emergency Contact Information:
+Structure this section with the following subsections using markdown tables:
+
+**Primary Emergency Services**
+| Service | Phone Number | Notes |
+|---------|--------------|-------|
+| Fire Department | 911 | [Local Fire Department Name] |
+| Police | 911 | [Local Police Department Name] |
+| Emergency Medical | 911 | [Local EMS Name] |
+| Poison Control | 1-800-222-1222 | 24/7 National Hotline |
+
+**Facility Emergency Contacts**
+| Role | Primary Contact | Backup Contact |
+|------|----------------|----------------|
+| Emergency Coordinator | [Name] [Phone] | [Name] [Phone] |
+| Facility Manager | [Name] [Phone] | [Name] [Phone] |
+| Safety Officer | [Name] [Phone] | [Name] [Phone] |
+| Maintenance Supervisor | [Name] [Phone] | [Name] [Phone] |
+
+**Support Services**
+Include pre-designated contractors from facility profile, plus standard services:
+| Service | Company | Phone | Notes |
+|---------|---------|-------|-------|
+| Mitigation Contractor | [From profile or blank] | [From profile or blank] | Water/Fire Damage |
+| Specialty Contents | [From profile or blank] | [From profile or blank] | Contents Restoration |
+| Electrical Service | [Local Provider] | [Phone] | Emergency Electrical |
+| HVAC Service | [Local Provider] | [Phone] | Climate Control |
+| Security Service | [Local Provider] | [Phone] | 24/7 Security |
+
+**Utilities and Infrastructure**
+| Utility | Emergency Contact | Account Number |
+|---------|------------------|----------------|
+| Electric | [Local utility provider and phone] | [Account #] |
+| Gas | [Local utility provider and phone] | [Account #] |
+| Water/Sewer | [Local utility contact] | [Account #] |
+| Telecommunications | [Provider] [Phone] | [Account #] |
 
 For each emergency scenario, provide:
 - Immediate actions (first 5 minutes)
