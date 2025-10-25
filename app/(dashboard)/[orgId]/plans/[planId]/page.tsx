@@ -75,26 +75,26 @@ export default async function PlanDetailPage({
   const hasSections = content.sections && content.sections.length > 0;
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
+    <div className="max-w-5xl mx-auto space-y-6 pb-20 md:pb-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="flex-1">
+          <h1 className="text-2xl md:text-3xl font-bold break-words">
             {content.facilityName || "Emergency Response Plan"}
           </h1>
-          <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
+          <div className="flex flex-wrap items-center gap-2 md:gap-4 mt-2 text-xs md:text-sm text-muted-foreground">
             <span>Version {content.version || plan.version}</span>
-            <span>•</span>
+            <span className="hidden sm:inline">•</span>
             <span>Created {formatDate(plan.created_at)}</span>
             {content.facilityType && (
               <>
-                <span>•</span>
+                <span className="hidden sm:inline">•</span>
                 <span className="capitalize">{content.facilityType} Facility</span>
               </>
             )}
           </div>
         </div>
-        <div className="flex space-x-2">
+        <div className="flex flex-wrap gap-2">
           {hasSections && (
             <SelectiveExportMenu
               planId={params.planId}
@@ -107,7 +107,8 @@ export default async function PlanDetailPage({
             <Button asChild size="sm">
               <Link href={`/${params.orgId}/plans/${params.planId}/edit`}>
                 <Edit className="mr-2 h-4 w-4" />
-                Edit
+                <span className="hidden sm:inline">Edit</span>
+                <span className="sm:hidden">Edit</span>
               </Link>
             </Button>
           )}
