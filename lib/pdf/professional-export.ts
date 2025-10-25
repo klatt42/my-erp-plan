@@ -208,18 +208,31 @@ export class ProfessionalPDFExporter {
   }
 
   /**
-   * Add a formatted table
+   * Add a formatted table with auto-expanding row height
    */
   private addTable(tableData: string[][]): void {
     if (tableData.length === 0) return;
 
     const numColumns = tableData[0].length;
     const colWidth = this.contentWidth / numColumns;
-    const rowHeight = 7;
+    const baseRowHeight = 7;
+    const lineHeight = 4;
 
     for (let i = 0; i < tableData.length; i++) {
       const row = tableData[i];
-      this.checkPageBreak(rowHeight);
+
+      // Calculate actual row height based on wrapped text
+      let maxLines = 1;
+      for (let j = 0; j < row.length; j++) {
+        const cellText = this.stripMarkdown(row[j]);
+        const lines = this.doc.splitTextToSize(cellText, colWidth - 4);
+        maxLines = Math.max(maxLines, lines.length);
+      }
+
+      const actualRowHeight = Math.max(baseRowHeight, maxLines * lineHeight + 2);
+      this.checkPageBreak(actualRowHeight);
+
+      const startY = this.yPosition;
 
       // Header row styling
       if (i === 0) {
@@ -227,9 +240,9 @@ export class ProfessionalPDFExporter {
         this.doc.setFillColor(230, 230, 230);
         this.doc.rect(
           this.margin,
-          this.yPosition - 5,
+          startY - 3,
           this.contentWidth,
-          rowHeight,
+          actualRowHeight,
           "F"
         );
         this.doc.setTextColor(0);
@@ -238,7 +251,7 @@ export class ProfessionalPDFExporter {
         this.doc.setTextColor(40);
       }
 
-      // Draw cells
+      // Draw cells with borders and text
       for (let j = 0; j < row.length; j++) {
         const cellX = this.margin + j * colWidth;
         const cellText = this.stripMarkdown(row[j]);
@@ -246,16 +259,20 @@ export class ProfessionalPDFExporter {
         // Draw cell border
         this.doc.setDrawColor(200);
         this.doc.setLineWidth(0.1);
-        this.doc.rect(cellX, this.yPosition - 5, colWidth, rowHeight);
+        this.doc.rect(cellX, startY - 3, colWidth, actualRowHeight);
 
-        // Draw text
+        // Draw text with wrapping
         this.doc.setFontSize(9);
-        this.doc.text(cellText, cellX + 2, this.yPosition, {
-          maxWidth: colWidth - 4,
-        });
+        const lines = this.doc.splitTextToSize(cellText, colWidth - 4);
+        let textY = startY;
+
+        for (const line of lines) {
+          this.doc.text(line, cellX + 2, textY);
+          textY += lineHeight;
+        }
       }
 
-      this.yPosition += rowHeight;
+      this.yPosition = startY + actualRowHeight;
     }
 
     this.yPosition += 5;
@@ -318,6 +335,49 @@ export class ProfessionalPDFExporter {
   }
 
   /**
+   * Add "Prepared by" section
+   */
+  private addPreparedBySection(): void {
+    this.checkPageBreak(30);
+
+    // Separator line
+    this.doc.setDrawColor(150);
+    this.doc.setLineWidth(0.5);
+    this.doc.line(
+      this.margin,
+      this.yPosition,
+      this.pageWidth - this.margin,
+      this.yPosition
+    );
+    this.yPosition += 8;
+
+    // "Prepared by" heading
+    this.doc.setFontSize(10);
+    this.doc.setFont("helvetica", "bold");
+    this.doc.setTextColor(0);
+    this.doc.text("Prepared by:", this.margin, this.yPosition);
+    this.yPosition += 6;
+
+    // Prism Specialties info
+    this.doc.setFont("helvetica", "normal");
+    this.doc.setFontSize(9);
+    this.doc.text("Prism Specialties of DC, MD, and VA Metro", this.margin, this.yPosition);
+    this.yPosition += 5;
+    this.doc.text("Emergency Response Planning & Mitigation Services", this.margin, this.yPosition);
+    this.yPosition += 5;
+    this.doc.text("Phone: 301-955-0885", this.margin, this.yPosition);
+    this.yPosition += 5;
+    this.doc.setTextColor(100);
+    this.doc.setFontSize(8);
+    this.doc.text(
+      "Available 24/7 for emergency response, mitigation, and contents restoration",
+      this.margin,
+      this.yPosition
+    );
+    this.yPosition += 8;
+  }
+
+  /**
    * Generate cover page
    */
   private generateCoverPage(content: PlanContent): void {
@@ -373,6 +433,7 @@ export class ProfessionalPDFExporter {
 
     // Generated date
     this.doc.setFontSize(10);
+    this.doc.setTextColor(0);
     const dateText = `Generated: ${content.generatedAt ? new Date(content.generatedAt).toLocaleDateString() : new Date().toLocaleDateString()}`;
     const dateWidth = this.doc.getTextWidth(dateText);
     this.doc.text(dateText, (this.pageWidth - dateWidth) / 2, this.yPosition);
@@ -408,6 +469,10 @@ export class ProfessionalPDFExporter {
       this.doc.text(line, (this.pageWidth - lineWidth) / 2, instructY);
       instructY += 4;
     }
+
+    // Add "Prepared by" at bottom of cover page
+    this.yPosition = this.pageHeight - 50;
+    this.addPreparedBySection();
   }
 
   /**
@@ -495,6 +560,10 @@ export class ProfessionalPDFExporter {
         this.addSection(section);
       }
     }
+
+    // Add "Prepared by" at the end
+    this.yPosition += 10;
+    this.addPreparedBySection();
 
     // Insert TOC after cover page
     const totalPages = this.currentPage;

@@ -415,7 +415,14 @@ ${profile.multilingualNeeds && profile.multilingualNeeds.length > 0 ? `MULTILING
 ${(profile as any).emergencyContacts ? `PRE-DESIGNATED EMERGENCY SERVICE PROVIDERS:
 Include these pre-designated contractors in the Emergency Contact Information section under "Support Services":
 ${(profile as any).emergencyContacts.mitigationContractor ? `- Mitigation Contractor: ${(profile as any).emergencyContacts.mitigationContractor}${(profile as any).emergencyContacts.mitigationContractorPhone ? ` | Phone: ${(profile as any).emergencyContacts.mitigationContractorPhone}` : ""}${(profile as any).emergencyContacts.mitigationContractorContact ? ` | Contact: ${(profile as any).emergencyContacts.mitigationContractorContact}` : ""}` : "- Mitigation Contractor: [To be determined]"}
-${(profile as any).emergencyContacts.specialtyContentsContractor ? `- Specialty Contents Contractor: ${(profile as any).emergencyContacts.specialtyContentsContractor}${(profile as any).emergencyContacts.specialtyContentsContractorPhone ? ` | Phone: ${(profile as any).emergencyContacts.specialtyContentsContractorPhone}` : ""}${(profile as any).emergencyContacts.specialtyContentsContractorContact ? ` | Contact: ${(profile as any).emergencyContacts.specialtyContentsContractorContact}` : ""}` : "- Specialty Contents Contractor: [To be determined]"}` : ""}`;
+${(profile as any).emergencyContacts.specialtyContentsContractor ? `- Specialty Contents Contractor: ${(profile as any).emergencyContacts.specialtyContentsContractor}${(profile as any).emergencyContacts.specialtyContentsContractorPhone ? ` | Phone: ${(profile as any).emergencyContacts.specialtyContentsContractorPhone}` : ""}${(profile as any).emergencyContacts.specialtyContentsContractorContact ? ` | Contact: ${(profile as any).emergencyContacts.specialtyContentsContractorContact}` : ""}` : "- Specialty Contents Contractor: [To be determined]"}
+
+CRITICAL: For ALL emergencies involving fire, water, smoke, or physical damage, the emergency response procedures MUST include:
+- IMMEDIATE notification (within first 24 hours) of BOTH the Mitigation Contractor AND Specialty Contents Contractor
+- Both contractors should be contacted together, not sequentially
+- This applies to fire damage, water damage, smoke damage, structural damage, or any combination thereof
+- Document this requirement prominently in the Emergency Scenarios and Response Procedures section
+- Include specific action items like: "Within 1 hour: Contact Mitigation Contractor AND Contents Contractor to initiate damage assessment and emergency services"` : ""}`;
 }
 
 /**
