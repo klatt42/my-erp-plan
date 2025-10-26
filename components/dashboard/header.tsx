@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, usePathname } from "next/navigation";
-import { LogOut, User, Menu } from "lucide-react";
+import { LogOut, User, Menu, ShieldCheck } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
@@ -68,7 +68,7 @@ export function Header({ userEmail, currentOrgId }: HeaderProps) {
               <SheetHeader className="px-6 pt-6 pb-4">
                 <SheetTitle className="flex items-center space-x-2">
                   <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-                    <span className="text-primary-foreground font-bold text-sm">ME</span>
+                    <ShieldCheck className="h-5 w-5 text-primary-foreground" />
                   </div>
                   <span className="font-semibold">My-ERP-Plan</span>
                 </SheetTitle>

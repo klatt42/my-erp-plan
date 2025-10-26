@@ -13,6 +13,7 @@ import { ActivatePlanButton } from "@/components/plans/ActivatePlanButton";
 import { CreateVersionButton } from "@/components/plans/CreateVersionButton";
 import { SectionNavigation } from "@/components/plans/SectionNavigation";
 import { SelectiveExportMenu } from "@/components/plans/SelectiveExportMenu";
+import RefreshPlanButton from "@/components/plans/RefreshPlanButton";
 
 interface ERPSection {
   title: string;
@@ -75,9 +76,9 @@ export default async function PlanDetailPage({
   const hasSections = content.sections && content.sections.length > 0;
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6 pb-20 md:pb-6">
+    <div className="max-w-5xl mx-auto space-y-4 md:space-y-6 pb-20 md:pb-6 px-2 md:px-0">
       {/* Header */}
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-3 md:gap-4 md:flex-row md:items-center md:justify-between">
         <div className="flex-1">
           <h1 className="text-2xl md:text-3xl font-bold break-words">
             {content.facilityName || "Emergency Response Plan"}
@@ -103,6 +104,12 @@ export default async function PlanDetailPage({
             />
           )}
           <ExportPdfButton planId={params.planId} planName={content.facilityName} />
+          <RefreshPlanButton
+            planId={params.planId}
+            orgId={params.orgId}
+            planStatus={plan.status}
+            size="sm"
+          />
           {plan.status === "draft" && (
             <Button asChild size="sm">
               <Link href={`/${params.orgId}/plans/${params.planId}/edit`}>
@@ -180,8 +187,8 @@ export default async function PlanDetailPage({
               Executive Summary
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="prose prose-sm max-w-none dark:prose-invert prose-table:text-sm">
+          <CardContent className="px-3 md:px-6">
+            <div className="prose prose-sm max-w-none dark:prose-invert prose-table:text-sm prose-p:text-sm prose-headings:text-base md:prose-headings:text-lg overflow-x-auto">
               <ReactMarkdown remarkPlugins={[remarkGfm]}>{content.executiveSummary}</ReactMarkdown>
             </div>
           </CardContent>
@@ -196,15 +203,15 @@ export default async function PlanDetailPage({
               <CardHeader>
                 <CardTitle>{section.title}</CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="prose prose-sm max-w-none dark:prose-invert prose-table:text-sm">
+              <CardContent className="px-3 md:px-6">
+                <div className="prose prose-sm max-w-none dark:prose-invert prose-table:text-xs md:prose-table:text-sm prose-p:text-sm prose-headings:text-base md:prose-headings:text-lg prose-ul:text-sm prose-ol:text-sm overflow-x-auto break-words">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>{section.content}</ReactMarkdown>
 
                   {section.subsections && section.subsections.length > 0 && (
-                    <div className="mt-6 space-y-4 pl-4 border-l-2 border-gray-200 dark:border-gray-700">
+                    <div className="mt-4 md:mt-6 space-y-3 md:space-y-4 pl-3 md:pl-4 border-l-2 border-gray-200 dark:border-gray-700">
                       {section.subsections.map((subsection, subIndex) => (
                         <div key={subIndex}>
-                          <h4 className="font-semibold text-base mb-2">
+                          <h4 className="font-semibold text-sm md:text-base mb-2">
                             {subsection.title}
                           </h4>
                           <ReactMarkdown remarkPlugins={[remarkGfm]}>{subsection.content}</ReactMarkdown>

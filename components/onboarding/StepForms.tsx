@@ -648,8 +648,146 @@ export function Step5Content({ form }: StepProps) {
         </div>
       </div>
 
+      {/* Internal Emergency Contacts */}
+      <div className="space-y-4 pt-6 border-t">
+        <div>
+          <Label className="text-lg font-medium">Internal Emergency Contacts</Label>
+          <p className="text-sm text-muted-foreground mt-1">
+            Key personnel who should be contacted during emergencies
+          </p>
+        </div>
+
+        {/* Emergency Coordinator */}
+        <Card>
+          <CardContent className="pt-6 space-y-4">
+            <h4 className="font-semibold">Emergency Coordinator *</h4>
+            <p className="text-sm text-muted-foreground">
+              Primary person responsible for emergency response and plan activation
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="emergencyCoordinator.name">Full Name *</Label>
+                <Input
+                  id="emergencyCoordinator.name"
+                  {...form.register("emergencyCoordinator.name")}
+                  placeholder="John Smith"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="emergencyCoordinator.title">Title/Position</Label>
+                <Input
+                  id="emergencyCoordinator.title"
+                  {...form.register("emergencyCoordinator.title")}
+                  placeholder="Safety Manager"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="emergencyCoordinator.phone">Phone Number *</Label>
+                <Input
+                  id="emergencyCoordinator.phone"
+                  {...form.register("emergencyCoordinator.phone")}
+                  placeholder="(555) 123-4567"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="emergencyCoordinator.email">Email Address *</Label>
+                <Input
+                  id="emergencyCoordinator.email"
+                  type="email"
+                  {...form.register("emergencyCoordinator.email")}
+                  placeholder="john@company.com"
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Alternate Emergency Contact */}
+        <Card>
+          <CardContent className="pt-6 space-y-4">
+            <h4 className="font-semibold">Alternate Emergency Contact</h4>
+            <p className="text-sm text-muted-foreground">
+              Backup contact if primary coordinator is unavailable
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="alternateContact.name">Full Name</Label>
+                <Input
+                  id="alternateContact.name"
+                  {...form.register("alternateContact.name")}
+                  placeholder="Jane Doe"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="alternateContact.title">Title/Position</Label>
+                <Input
+                  id="alternateContact.title"
+                  {...form.register("alternateContact.title")}
+                  placeholder="Assistant Manager"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="alternateContact.phone">Phone Number</Label>
+                <Input
+                  id="alternateContact.phone"
+                  {...form.register("alternateContact.phone")}
+                  placeholder="(555) 123-4567"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="alternateContact.email">Email Address</Label>
+                <Input
+                  id="alternateContact.email"
+                  type="email"
+                  {...form.register("alternateContact.email")}
+                  placeholder="jane@company.com"
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Facility Manager */}
+        <Card>
+          <CardContent className="pt-6 space-y-4">
+            <h4 className="font-semibold">Facility Manager</h4>
+            <p className="text-sm text-muted-foreground">
+              Contact for building/facility-specific emergencies
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="facilityManager.name">Full Name</Label>
+                <Input
+                  id="facilityManager.name"
+                  {...form.register("facilityManager.name")}
+                  placeholder="Bob Johnson"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="facilityManager.phone">Phone Number</Label>
+                <Input
+                  id="facilityManager.phone"
+                  {...form.register("facilityManager.phone")}
+                  placeholder="(555) 123-4567"
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Emergency Team */}
-      <div className="space-y-4">
+      <div className="space-y-4 pt-6 border-t">
         <div className="flex items-center space-x-2">
           <Checkbox
             id="hasEmergencyTeam"

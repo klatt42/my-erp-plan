@@ -1,3 +1,55 @@
 {
-  "pages": {}
+  "pages": {
+    "/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/layout.css",
+      "static/chunks/app/layout.js"
+    ],
+    "/(dashboard)/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(dashboard)/layout.js"
+    ],
+    "/(dashboard)/[orgId]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(dashboard)/[orgId]/page.js"
+    ],
+    "/(dashboard)/[orgId]/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(dashboard)/[orgId]/layout.js"
+    ],
+    "/(dashboard)/[orgId]/settings/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(dashboard)/[orgId]/settings/page.js"
+    ],
+    "/(dashboard)/[orgId]/plans/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(dashboard)/[orgId]/plans/page.js"
+    ],
+    "/(dashboard)/[orgId]/plans/[planId]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(dashboard)/[orgId]/plans/[planId]/page.js"
+    ],
+    "/(dashboard)/[orgId]/plans/[planId]/edit/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(dashboard)/[orgId]/plans/[planId]/edit/page.js"
+    ],
+    "/(dashboard)/onboarding/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(dashboard)/onboarding/page.js"
+    ],
+    "/(dashboard)/[orgId]/plans/new/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(dashboard)/[orgId]/plans/new/page.js"
+    ]
+  }
 }

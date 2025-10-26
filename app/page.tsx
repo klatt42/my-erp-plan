@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Shield, Zap, Users, FileText } from "lucide-react";
+import { ArrowRight, Shield, Zap, Users, FileText, ShieldCheck } from "lucide-react";
 
 export default function HomePage() {
   return (
@@ -10,9 +10,7 @@ export default function HomePage() {
         <div className="container flex h-16 items-center justify-between">
           <div className="flex items-center space-x-2">
             <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">
-                ME
-              </span>
+              <ShieldCheck className="h-5 w-5 text-primary-foreground" />
             </div>
             <span className="font-bold text-xl">My-ERP-Plan</span>
           </div>

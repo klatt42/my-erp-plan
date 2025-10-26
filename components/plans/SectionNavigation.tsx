@@ -6,10 +6,10 @@
  */
 
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, FileText, Phone, AlertCircle, Users, MapPin, Radio, Package, GraduationCap, RefreshCw } from "lucide-react";
+import { FileText, Phone, AlertCircle, Users, MapPin, Radio, Package, GraduationCap, RefreshCw, ChevronRight, ChevronLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { EmergencyNavButton } from "./EmergencyNavButton";
+import { Button } from "@/components/ui/button";
 
 interface ERPSection {
   title: string;
@@ -46,17 +46,46 @@ const getSectionIcon = (title: string) => {
 export function SectionNavigation({ sections, executiveSummary, className }: SectionNavigationProps) {
   const [activeSection, setActiveSection] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [isDesktopSidebarOpen, setIsDesktopSidebarOpen] = useState(true);
 
   // Scroll to section
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
-    if (element) {
-      const yOffset = -80; // Offset for fixed header
-      const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
-      window.scrollTo({ top: y, behavior: "smooth" });
-      setActiveSection(sectionId);
-      setIsOpen(false);
+
+    if (!element) {
+      return;
     }
+
+    // Close the sheet first
+    setIsOpen(false);
+
+    // Auto-minimize desktop sidebar after navigation
+    setIsDesktopSidebarOpen(false);
+
+    // Wait for sheet to close before scrolling (300ms animation)
+    setTimeout(() => {
+      // Find the scrollable container (main element with overflow-y-auto)
+      const scrollContainer = document.querySelector('main');
+
+      if (scrollContainer) {
+        // Scroll within the container
+        const containerTop = scrollContainer.getBoundingClientRect().top;
+        const elementTop = element.getBoundingClientRect().top;
+        const offset = elementTop - containerTop - 20; // 20px padding from top
+
+        scrollContainer.scrollTo({
+          top: scrollContainer.scrollTop + offset,
+          behavior: "smooth"
+        });
+      } else {
+        // Fallback to window scroll if container not found
+        const yOffset = -100;
+        const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+        window.scrollTo({ top: y, behavior: "smooth" });
+      }
+
+      setActiveSection(sectionId);
+    }, 350);
   };
 
   // Track active section on scroll
@@ -102,106 +131,66 @@ export function SectionNavigation({ sections, executiveSummary, className }: Sec
   ];
 
   return (
-    <div className={cn("fixed bottom-4 right-4 z-50 lg:hidden", className)}>
-      {/* Mobile: Floating Action Button */}
-      <Sheet open={isOpen} onOpenChange={setIsOpen}>
-        <SheetTrigger asChild>
-          <Button
-            size="lg"
-            className="h-14 w-14 rounded-full shadow-lg"
-            aria-label="Open navigation menu"
-          >
-            <Menu className="h-6 w-6" />
-          </Button>
-        </SheetTrigger>
+    <>
+      {/* Mobile: Floating Emergency Navigation Button */}
+      <EmergencyNavButton
+        sections={allSections}
+        activeSection={activeSection}
+        onNavigate={scrollToSection}
+        className={className}
+      />
 
-        <SheetContent side="right" className="w-full sm:w-[400px] overflow-y-auto">
-          <SheetHeader>
-            <SheetTitle>Emergency Plan Sections</SheetTitle>
-          </SheetHeader>
-
-          <div className="mt-6 space-y-2">
-            {allSections.map((section) => {
-              const Icon = getSectionIcon(section.title);
-              const isActive = activeSection === section.id;
-
-              return (
-                <button
-                  key={section.id}
-                  onClick={() => scrollToSection(section.id)}
-                  className={cn(
-                    "w-full flex items-start gap-3 p-3 rounded-lg text-left transition-colors",
-                    isActive
-                      ? "bg-primary text-primary-foreground"
-                      : "hover:bg-muted"
-                  )}
-                >
-                  <Icon className="h-5 w-5 mt-0.5 flex-shrink-0" />
-                  <span className="text-sm font-medium leading-tight">{section.title}</span>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Quick Actions */}
-          <div className="mt-8 pt-6 border-t">
-            <h3 className="text-sm font-semibold mb-3">Quick Actions</h3>
-            <div className="space-y-2">
+      {/* Desktop: Collapsible Sidebar (hidden on mobile) */}
+      <div className="hidden lg:block fixed right-4 top-24 z-40">
+        {isDesktopSidebarOpen ? (
+          <div className="w-64 max-h-[calc(100vh-8rem)] overflow-y-auto bg-card border rounded-lg shadow-lg">
+            <div className="flex items-center justify-between p-4 border-b">
+              <h3 className="text-sm font-semibold">Plan Sections</h3>
               <Button
-                variant="outline"
-                size="sm"
-                className="w-full justify-start"
-                onClick={() => {
-                  scrollToSection("section-emergency-contact");
-                  setIsOpen(false);
-                }}
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6"
+                onClick={() => setIsDesktopSidebarOpen(false)}
+                aria-label="Minimize sidebar"
               >
-                <Phone className="mr-2 h-4 w-4" />
-                Emergency Contacts
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full justify-start"
-                onClick={() => {
-                  scrollToSection("section-evacuation");
-                  setIsOpen(false);
-                }}
-              >
-                <MapPin className="mr-2 h-4 w-4" />
-                Evacuation Routes
+                <ChevronRight className="h-4 w-4" />
               </Button>
             </div>
+            <div className="space-y-1 p-4 pt-2">
+              {allSections.map((section) => {
+                const Icon = getSectionIcon(section.title);
+                const isActive = activeSection === section.id;
+
+                return (
+                  <button
+                    key={section.id}
+                    onClick={() => scrollToSection(section.id)}
+                    className={cn(
+                      "w-full flex items-start gap-2 p-2 rounded text-left transition-colors text-sm",
+                      isActive
+                        ? "bg-primary text-primary-foreground"
+                        : "hover:bg-muted"
+                    )}
+                  >
+                    <Icon className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                    <span className="leading-tight">{section.title}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        </SheetContent>
-      </Sheet>
-
-      {/* Desktop: Sidebar (hidden on mobile) */}
-      <div className="hidden lg:block fixed right-4 top-24 w-64 max-h-[calc(100vh-8rem)] overflow-y-auto bg-card border rounded-lg shadow-lg p-4">
-        <h3 className="text-sm font-semibold mb-4">Plan Sections</h3>
-        <div className="space-y-1">
-          {allSections.map((section) => {
-            const Icon = getSectionIcon(section.title);
-            const isActive = activeSection === section.id;
-
-            return (
-              <button
-                key={section.id}
-                onClick={() => scrollToSection(section.id)}
-                className={cn(
-                  "w-full flex items-start gap-2 p-2 rounded text-left transition-colors text-sm",
-                  isActive
-                    ? "bg-primary text-primary-foreground"
-                    : "hover:bg-muted"
-                )}
-              >
-                <Icon className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                <span className="leading-tight">{section.title}</span>
-              </button>
-            );
-          })}
-        </div>
+        ) : (
+          <Button
+            variant="default"
+            size="icon"
+            className="h-12 w-12 rounded-full shadow-lg"
+            onClick={() => setIsDesktopSidebarOpen(true)}
+            aria-label="Open plan navigation"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </Button>
+        )}
       </div>
-    </div>
+    </>
   );
 }

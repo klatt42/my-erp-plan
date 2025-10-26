@@ -61,26 +61,36 @@ export function EmergencyModeClient({
       const lines = scenarioSection.content.split("\n");
       const items: ActionItem[] = [];
 
+      console.log('[Emergency Mode] Scenario section content:', scenarioSection.content.substring(0, 500));
+
       for (const line of lines) {
         const trimmed = line.trim();
-        if (trimmed.startsWith("-") || trimmed.match(/^\d+\./)) {
+
+        // Match bullets (-, *, +) or numbered lists (1., 2., etc.)
+        if (trimmed.startsWith("-") || trimmed.startsWith("*") || trimmed.startsWith("+") || trimmed.match(/^\d+\./)) {
           const cleanText = trimmed
             .replace(/^[-*+]\s+/, "")
             .replace(/^\d+\.\s+/, "")
-            .replace(/\*\*(.+?)\*\*/g, "$1")
-            .replace(/\*(.+?)\*/g, "$1");
+            .replace(/\*\*(.+?)\*\*/g, "$1") // Remove bold
+            .replace(/\*(.+?)\*/g, "$1")      // Remove italic
+            .trim();
 
-          items.push({
-            id: `action-${items.length}`,
-            text: cleanText,
-            completed: false,
-          });
+          if (cleanText.length > 5) { // Ignore very short items
+            items.push({
+              id: `action-${items.length}`,
+              text: cleanText,
+              completed: false,
+            });
 
-          if (items.length >= 15) break; // Limit to 15 critical actions
+            if (items.length >= 15) break; // Limit to 15 critical actions
+          }
         }
       }
 
+      console.log('[Emergency Mode] Extracted action items:', items.length);
       setActionItems(items);
+    } else {
+      console.log('[Emergency Mode] No scenario section found');
     }
   }, [scenarioSection]);
 
@@ -121,22 +131,62 @@ export function EmergencyModeClient({
 
   // Parse emergency contacts from table
   const parseContacts = (content: string) => {
-    const contacts: Array<{ service: string; phone: string }> = [];
+    const contacts: Array<{ service: string; phone: string; company?: string }> = [];
     const lines = content.split("\n");
+    let phoneColumnIndex = -1;
+    let serviceColumnIndex = -1;
+    let companyColumnIndex = -1;
 
     for (const line of lines) {
       if (line.includes("|") && !line.match(/^[-:|]+$/)) {
         const cells = line.split("|").map((c) => c.trim()).filter(Boolean);
-        if (cells.length >= 2 && cells[0] && cells[1]) {
-          // Skip header row
-          if (!cells[0].toLowerCase().includes("service")) {
-            contacts.push({ service: cells[0], phone: cells[1] });
+
+        // Detect header row to find column indices
+        if (cells[0]?.toLowerCase().includes("service") ||
+            cells[0]?.toLowerCase().includes("role")) {
+          serviceColumnIndex = 0;
+
+          // Find phone column
+          for (let i = 0; i < cells.length; i++) {
+            const header = cells[i].toLowerCase();
+            if (header.includes("phone") || header.includes("number") || header.includes("contact")) {
+              phoneColumnIndex = i;
+            }
+            if (header.includes("company")) {
+              companyColumnIndex = i;
+            }
+          }
+          continue; // Skip header row
+        }
+
+        // Extract data rows
+        if (serviceColumnIndex >= 0 && phoneColumnIndex >= 0 && cells.length > phoneColumnIndex) {
+          const service = cells[serviceColumnIndex];
+          const phone = cells[phoneColumnIndex];
+          const company = companyColumnIndex >= 0 ? cells[companyColumnIndex] : undefined;
+
+          // Skip empty rows or placeholder values
+          if (service && phone &&
+              !phone.includes("[") &&
+              !phone.toLowerCase().includes("phone") &&
+              phone.trim().length > 0) {
+
+            // For support services, show company name instead of service category
+            const displayName = company && company.trim().length > 0 && !company.includes("[")
+              ? company
+              : service;
+
+            contacts.push({
+              service: displayName,
+              phone,
+              company
+            });
           }
         }
       }
     }
 
-    return contacts.slice(0, 6); // Top 6 contacts
+    return contacts.slice(0, 8); // Top 8 contacts
   };
 
   const emergencyContacts = contactSection ? parseContacts(contactSection.content) : [];
@@ -155,7 +205,7 @@ export function EmergencyModeClient({
               <p className="text-sm text-red-200 mt-1">{facilityName}</p>
             </div>
             <Link href={`/${orgId}/plans/${planId}`}>
-              <Button variant="outline" size="sm" className="text-white border-white">
+              <Button variant="outline" size="sm" className="bg-white text-red-900 border-white hover:bg-red-100 hover:text-red-900">
                 <X className="h-4 w-4 mr-2" />
                 Exit
               </Button>
@@ -213,31 +263,35 @@ export function EmergencyModeClient({
         )}
 
         {/* Action Checklist */}
-        {actionItems.length > 0 && (
+        {actionItems.length > 0 ? (
           <Card className="bg-red-900 border-red-700">
             <CardHeader>
               <CardTitle className="text-white text-xl">Critical Actions</CardTitle>
+              <p className="text-sm text-red-200 mt-2">
+                Tap each item to check it off as you complete it. Progress is tracked above.
+              </p>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {actionItems.map((item) => (
                   <div
                     key={item.id}
-                    className={`flex items-start gap-3 p-4 rounded-lg transition-all ${
+                    onClick={() => toggleAction(item.id)}
+                    className={`flex items-start gap-3 p-4 rounded-lg transition-all cursor-pointer hover:scale-[1.02] ${
                       item.completed
-                        ? "bg-green-900/50 border border-green-700"
-                        : "bg-red-800 border border-red-600"
+                        ? "bg-green-900/50 border-2 border-green-700"
+                        : "bg-red-800 border-2 border-red-600 hover:border-red-400"
                     }`}
                   >
                     <Checkbox
                       id={item.id}
                       checked={item.completed}
                       onCheckedChange={() => toggleAction(item.id)}
-                      className="mt-1 h-6 w-6 border-2"
+                      className="mt-1 h-6 w-6 border-2 pointer-events-none"
                     />
                     <label
                       htmlFor={item.id}
-                      className={`flex-1 text-base cursor-pointer ${
+                      className={`flex-1 text-base cursor-pointer select-none ${
                         item.completed ? "line-through text-gray-400" : "text-white"
                       }`}
                     >
@@ -248,10 +302,37 @@ export function EmergencyModeClient({
               </div>
             </CardContent>
           </Card>
+        ) : scenarioSection && scenarioSection.content.trim().length > 0 ? (
+          <Card className="bg-red-900 border-red-700">
+            <CardHeader>
+              <CardTitle className="text-white text-xl">Emergency Procedures</CardTitle>
+              <p className="text-sm text-red-200 mt-2">
+                Follow the procedures below. Refer to the full plan for complete details.
+              </p>
+            </CardHeader>
+            <CardContent>
+              <div className="prose prose-invert prose-sm max-w-none text-white [&>*]:text-white [&_p]:text-white [&_li]:text-white [&_h1]:text-white [&_h2]:text-white [&_h3]:text-white [&_h4]:text-white [&_table]:text-white [&_th]:bg-red-800 [&_th]:text-white [&_th]:font-bold [&_td]:text-white [&_thead]:border-red-700">
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  {scenarioSection.content}
+                </ReactMarkdown>
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="bg-red-900 border-red-700">
+            <CardHeader>
+              <CardTitle className="text-white text-xl">Emergency Procedures</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-white text-center py-8">
+                No emergency procedures found in this plan. Please refer to the complete plan document or call 911 for immediate assistance.
+              </p>
+            </CardContent>
+          </Card>
         )}
 
         {/* Evacuation Info */}
-        {evacuationSection && (
+        {evacuationSection && evacuationSection.content.trim().length > 0 && (
           <Card className="bg-red-900 border-red-700">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-white text-xl">
@@ -260,9 +341,9 @@ export function EmergencyModeClient({
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="prose prose-invert prose-sm max-w-none">
+              <div className="prose prose-invert prose-sm max-w-none text-white [&>*]:text-white [&_p]:text-white [&_li]:text-white [&_h1]:text-white [&_h2]:text-white [&_h3]:text-white [&_h4]:text-white [&_table]:text-white [&_th]:bg-red-800 [&_th]:text-white [&_th]:font-bold [&_td]:text-white [&_thead]:border-red-700 [&_strong]:text-white">
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                  {evacuationSection.content.substring(0, 500) + "..."}
+                  {evacuationSection.content}
                 </ReactMarkdown>
               </div>
             </CardContent>

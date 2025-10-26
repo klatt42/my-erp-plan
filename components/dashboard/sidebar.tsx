@@ -9,6 +9,7 @@ import {
   Settings,
   CreditCard,
   LayoutDashboard,
+  ShieldCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
@@ -34,7 +35,7 @@ export function Sidebar({ orgId }: SidebarProps) {
       <div className="flex h-16 items-center px-6">
         <Link href={`/${orgId}`} className="flex items-center space-x-2">
           <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-            <span className="text-primary-foreground font-bold text-sm">ME</span>
+            <ShieldCheck className="h-5 w-5 text-primary-foreground" />
           </div>
           <span className="font-semibold">My-ERP-Plan</span>
         </Link>

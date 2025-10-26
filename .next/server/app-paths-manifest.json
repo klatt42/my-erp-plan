@@ -1,1 +1,8 @@
-{}
+{
+  "/api/plans/[planId]/refresh/route": "app/api/plans/[planId]/refresh/route.js",
+  "/(dashboard)/[orgId]/plans/page": "app/(dashboard)/[orgId]/plans/page.js",
+  "/(dashboard)/[orgId]/plans/[planId]/page": "app/(dashboard)/[orgId]/plans/[planId]/page.js",
+  "/(dashboard)/[orgId]/plans/[planId]/edit/page": "app/(dashboard)/[orgId]/plans/[planId]/edit/page.js",
+  "/(dashboard)/[orgId]/plans/new/page": "app/(dashboard)/[orgId]/plans/new/page.js",
+  "/(dashboard)/[orgId]/page": "app/(dashboard)/[orgId]/page.js"
+}

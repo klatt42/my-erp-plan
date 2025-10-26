@@ -403,6 +403,69 @@ export function buildSystemPrompt(profile: FacilityProfile): string {
     .filter(Boolean)
     .join("\n\n");
 
+  // Extract facility research data if available
+  const facilityResearch = (profile as any).facilityResearch;
+  let researchSection = "";
+
+  if (facilityResearch) {
+    // Build emergency services section
+    const emergencyServices = facilityResearch.emergency_services || [];
+    let emergencyServicesText = "";
+
+    if (emergencyServices.length > 0) {
+      emergencyServicesText = `\n\nLOCAL EMERGENCY SERVICES (Verified via research on ${new Date(facilityResearch.researched_at).toLocaleDateString()}):
+Include these verified local emergency services in the Emergency Contact Information section:
+
+**Primary Emergency Services**
+${emergencyServices.map((service: any) => {
+  const typeLabels: Record<string, string> = {
+    hospital: "Hospital/Emergency Room",
+    fire: "Fire Department",
+    police: "Police Department",
+    poison_control: "Poison Control Center"
+  };
+  return `- ${typeLabels[service.type] || service.type}: ${service.name}
+  Address: ${service.address}
+  Phone: ${service.phone}${service.distance ? `
+  Distance: ${service.distance}` : ""}${service.notes ? `
+  Notes: ${service.notes}` : ""}`;
+}).join("\n")}
+
+IMPORTANT: These are real, verified emergency services for this location. Use these specific contacts in the Emergency Contact Information section.`;
+    }
+
+    // Build local hazards section
+    const localHazards = facilityResearch.local_hazards || [];
+    let hazardsText = "";
+
+    if (localHazards.length > 0) {
+      hazardsText = `\n\nLOCAL HAZARD ASSESSMENT (Based on location research):
+The following environmental and natural hazards have been identified for this facility location:
+
+${localHazards.map((hazard: any) => `- **${hazard.type}** (${hazard.severity.toUpperCase()} Risk): ${hazard.description}${hazard.preparedness_notes ? `
+  Preparedness: ${hazard.preparedness_notes}` : ""}`).join("\n")}
+
+CRITICAL: Incorporate these location-specific hazards into the Emergency Scenarios and Response Procedures section. Ensure the plan addresses each identified risk with appropriate preparedness measures.`;
+    }
+
+    // Build facility info section
+    const facilityInfo = facilityResearch.facility_info || {};
+    let facilityInfoText = "";
+
+    if (facilityInfo.business_type || facilityInfo.operations_summary) {
+      facilityInfoText = `\n\nFACILITY CONTEXT (From research):
+${facilityInfo.business_type ? `- Business Type: ${facilityInfo.business_type}` : ""}
+${facilityInfo.operations_summary ? `- Operations: ${facilityInfo.operations_summary}` : ""}
+${facilityInfo.estimated_size ? `- Estimated Size: ${facilityInfo.estimated_size}` : ""}
+${facilityInfo.industry_regulations && facilityInfo.industry_regulations.length > 0 ? `- Applicable Regulations: ${facilityInfo.industry_regulations.join(", ")}` : ""}
+${facilityInfo.special_hazards && facilityInfo.special_hazards.length > 0 ? `- Known Hazards: ${facilityInfo.special_hazards.join(", ")}` : ""}
+
+Use this facility context to tailor the emergency response procedures to the actual operations and risks present.`;
+    }
+
+    researchSection = emergencyServicesText + hazardsText + facilityInfoText;
+  }
+
   return `${BASE_SYSTEM_PROMPT}
 
 ${compliancePrompts}
@@ -410,9 +473,22 @@ ${compliancePrompts}
 ACCESSIBILITY REQUIREMENTS:
 ${profile.accessibilityNeeds ? "- Ensure all procedures accommodate individuals with disabilities\n- Include visual, auditory, and mobility considerations\n- Specify assistance protocols for evacuation" : "- Standard accessibility considerations apply"}
 
-${profile.multilingualNeeds && profile.multilingualNeeds.length > 0 ? `MULTILINGUAL REQUIREMENTS:\n- Plan must be available in: ${profile.multilingualNeeds.join(", ")}\n- Consider language barriers in emergency communication` : ""}
+${profile.multilingualNeeds && profile.multilingualNeeds.length > 0 ? `MULTILINGUAL REQUIREMENTS:\n- Plan must be available in: ${profile.multilingualNeeds.join(", ")}\n- Consider language barriers in emergency communication` : ""}${researchSection}
 
-${(profile as any).emergencyContacts ? `PRE-DESIGNATED EMERGENCY SERVICE PROVIDERS:
+${(profile as any).emergencyContacts?.emergencyCoordinator ? `\n\nINTERNAL EMERGENCY CONTACTS:
+Include these verified internal contacts in the Emergency Contact Information section under "Facility Emergency Contacts":
+- Emergency Coordinator: ${(profile as any).emergencyContacts.emergencyCoordinator.name}, ${(profile as any).emergencyContacts.emergencyCoordinator.title}
+  Phone: ${(profile as any).emergencyContacts.emergencyCoordinator.phone}
+  Email: ${(profile as any).emergencyContacts.emergencyCoordinator.email}
+${(profile as any).emergencyContacts.alternateContact?.name ? `- Alternate Emergency Contact: ${(profile as any).emergencyContacts.alternateContact.name}, ${(profile as any).emergencyContacts.alternateContact.title || ""}
+  Phone: ${(profile as any).emergencyContacts.alternateContact.phone || ""}
+  Email: ${(profile as any).emergencyContacts.alternateContact.email || ""}` : ""}
+${(profile as any).emergencyContacts.facilityManager?.name ? `- Facility Manager: ${(profile as any).emergencyContacts.facilityManager.name}
+  Phone: ${(profile as any).emergencyContacts.facilityManager.phone || ""}` : ""}
+
+IMPORTANT: Use these specific internal contacts in the Facility Emergency Contacts table.` : ""}
+
+${(profile as any).emergencyContacts ? `\n\nPRE-DESIGNATED EMERGENCY SERVICE PROVIDERS:
 Include these pre-designated contractors in the Emergency Contact Information section under "Support Services":
 ${(profile as any).emergencyContacts.mitigationContractor ? `- Mitigation Contractor: ${(profile as any).emergencyContacts.mitigationContractor}${(profile as any).emergencyContacts.mitigationContractorPhone ? ` | Phone: ${(profile as any).emergencyContacts.mitigationContractorPhone}` : ""}${(profile as any).emergencyContacts.mitigationContractorContact ? ` | Contact: ${(profile as any).emergencyContacts.mitigationContractorContact}` : ""}` : "- Mitigation Contractor: [To be determined]"}
 ${(profile as any).emergencyContacts.specialtyContentsContractor ? `- Specialty Contents Contractor: ${(profile as any).emergencyContacts.specialtyContentsContractor}${(profile as any).emergencyContacts.specialtyContentsContractorPhone ? ` | Phone: ${(profile as any).emergencyContacts.specialtyContentsContractorPhone}` : ""}${(profile as any).emergencyContacts.specialtyContentsContractorContact ? ` | Contact: ${(profile as any).emergencyContacts.specialtyContentsContractorContact}` : ""}` : "- Specialty Contents Contractor: [To be determined]"}
@@ -451,38 +527,57 @@ SECTION 3 FORMAT REQUIREMENTS - Emergency Contact Information:
 Structure this section with the following subsections using markdown tables:
 
 **Primary Emergency Services**
+IMPORTANT: If local emergency services were provided in the system prompt above (from facility research), use those specific names, addresses, and phone numbers. DO NOT use placeholder brackets. If no research data was provided, use standard 911 services.
+
+Example with research data:
+| Service | Phone Number | Address/Notes |
+|---------|--------------|---------------|
+| Fire Department | (555) 234-5678 | Downtown Fire Station #3, 123 Main St |
+| Police | (555) 345-6789 | City Police Dept, 456 Oak Ave (Non-emergency) |
+| Hospital/Emergency Room | (555) 456-7890 | Memorial Hospital, 789 Elm St - 2.3 miles |
+| Poison Control | 1-800-222-1222 | 24/7 National Hotline |
+
+If no research data available:
 | Service | Phone Number | Notes |
 |---------|--------------|-------|
-| Fire Department | 911 | [Local Fire Department Name] |
-| Police | 911 | [Local Police Department Name] |
-| Emergency Medical | 911 | [Local EMS Name] |
+| Fire Department | 911 | Emergency |
+| Police | 911 | Emergency |
+| Emergency Medical | 911 | Emergency |
 | Poison Control | 1-800-222-1222 | 24/7 National Hotline |
 
 **Facility Emergency Contacts**
+IMPORTANT: Use the actual internal contact information provided in the system prompt above. DO NOT use placeholder brackets like [Name] or [Phone]. If specific contacts were provided, use them with their actual names, titles, phone numbers, and emails. If no contact was provided for a role, write "To be assigned" instead of brackets.
+
+Example format:
 | Role | Primary Contact | Backup Contact |
 |------|----------------|----------------|
-| Emergency Coordinator | [Name] [Phone] | [Name] [Phone] |
-| Facility Manager | [Name] [Phone] | [Name] [Phone] |
-| Safety Officer | [Name] [Phone] | [Name] [Phone] |
-| Maintenance Supervisor | [Name] [Phone] | [Name] [Phone] |
+| Emergency Coordinator | John Smith, Safety Manager (555) 123-4567 john@company.com | To be assigned |
+| Facility Manager | Jane Doe (555) 987-6543 | To be assigned |
+| Safety Officer | To be assigned | To be assigned |
+| Maintenance Supervisor | To be assigned | To be assigned |
 
 **Support Services**
-Include pre-designated contractors from facility profile, plus standard services:
+IMPORTANT: Use actual contractor information from the system prompt above. If contractors were provided, include their names and phone numbers. If not provided, write "To be determined" - DO NOT use brackets.
+
+Example format:
 | Service | Company | Phone | Notes |
 |---------|---------|-------|-------|
-| Mitigation Contractor | [From profile or blank] | [From profile or blank] | Water/Fire Damage |
-| Specialty Contents | [From profile or blank] | [From profile or blank] | Contents Restoration |
-| Electrical Service | [Local Provider] | [Phone] | Emergency Electrical |
-| HVAC Service | [Local Provider] | [Phone] | Climate Control |
-| Security Service | [Local Provider] | [Phone] | 24/7 Security |
+| Mitigation Contractor | RestorePro Services | (555) 111-2222 | Water/Fire Damage - 24/7 |
+| Specialty Contents | Heritage Restoration | (555) 333-4444 | Contents/Document Restoration |
+| Electrical Service | To be determined | To be determined | Emergency Electrical |
+| HVAC Service | To be determined | To be determined | Climate Control |
+| Security Service | To be determined | To be determined | 24/7 Security |
 
 **Utilities and Infrastructure**
+IMPORTANT: DO NOT use placeholder brackets. Write "To be determined" for unknown information.
+
+Example format:
 | Utility | Emergency Contact | Account Number |
 |---------|------------------|----------------|
-| Electric | [Local utility provider and phone] | [Account #] |
-| Gas | [Local utility provider and phone] | [Account #] |
-| Water/Sewer | [Local utility contact] | [Account #] |
-| Telecommunications | [Provider] [Phone] | [Account #] |
+| Electric | Local Electric Co. (555) 999-8888 | To be determined |
+| Gas | City Gas Company (555) 888-7777 | To be determined |
+| Water/Sewer | Municipal Water Dept (555) 777-6666 | To be determined |
+| Telecommunications | To be determined | To be determined |
 
 For each emergency scenario, provide:
 - Immediate actions (first 5 minutes)

@@ -1,162 +1,137 @@
 "use client";
 
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter, useParams } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
-import { generatePlanContent } from "@/lib/anthropic/client";
-import { createPlanSchema, type CreatePlanInput } from "@/lib/validations/plan";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { ClipboardList, Sparkles, ArrowRight, CheckCircle2 } from "lucide-react";
 
 export default function NewPlanPage() {
   const router = useRouter();
   const params = useParams();
   const orgId = params.orgId as string;
-  const [error, setError] = useState<string | null>(null);
-  const [isGenerating, setIsGenerating] = useState(false);
-
-  const form = useForm<CreatePlanInput>({
-    resolver: zodResolver(createPlanSchema),
-    defaultValues: {
-      version: "1.0",
-      prompt: "",
-    },
-  });
-
-  async function onSubmit(data: CreatePlanInput) {
-    setIsGenerating(true);
-    setError(null);
-
-    try {
-      const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-
-      if (!user) {
-        setError("You must be logged in to create a plan");
-        return;
-      }
-
-      // Generate plan content with Claude
-      const generatedContent = await generatePlanContent(data.prompt);
-
-      // Create the plan
-      const { data: plan, error: createError } = await supabase
-        .from("emergency_plans")
-        .insert({
-          org_id: orgId,
-          version: data.version,
-          status: "draft",
-          content_json: { generated_content: generatedContent },
-          created_by: user.id,
-        })
-        .select()
-        .single();
-
-      if (createError) {
-        setError(createError.message);
-        return;
-      }
-
-      router.push(`/${orgId}/plans/${plan.id}`);
-      router.refresh();
-    } catch (err) {
-      setError("Failed to generate plan. Please try again.");
-    } finally {
-      setIsGenerating(false);
-    }
-  }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Create Emergency Plan</h1>
         <p className="text-muted-foreground">
-          Use AI to generate a comprehensive emergency response plan
+          Choose how you'd like to create your emergency response plan
         </p>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Plan Details</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              {error && (
-                <div className="bg-destructive/15 text-destructive px-4 py-3 rounded-md text-sm">
-                  {error}
-                </div>
-              )}
-
-              <FormField
-                control={form.control}
-                name="version"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Version</FormLabel>
-                    <FormControl>
-                      <Input placeholder="1.0" {...field} disabled={isGenerating} />
-                    </FormControl>
-                    <FormDescription>
-                      Version number for this plan
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="prompt"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Plan Description</FormLabel>
-                    <FormControl>
-                      <textarea
-                        className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                        placeholder="Describe the type of emergency plan you need. For example: 'Create a fire evacuation plan for a 5-story office building with 200 employees'"
-                        {...field}
-                        disabled={isGenerating}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Provide details about your organization and the type of plan
-                      you need
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="flex justify-end space-x-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => router.back()}
-                  disabled={isGenerating}
-                >
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={isGenerating}>
-                  {isGenerating ? "Generating plan..." : "Generate plan"}
-                </Button>
+      <div className="grid gap-6 md:grid-cols-2">
+        {/* Guided Questionnaire - Recommended */}
+        <Card className="relative border-primary shadow-md hover:shadow-lg transition-shadow">
+          <div className="absolute -top-3 left-4">
+            <Badge className="bg-primary text-primary-foreground">
+              Recommended
+            </Badge>
+          </div>
+          <CardHeader className="pt-8">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 rounded-lg bg-primary/10">
+                <ClipboardList className="h-6 w-6 text-primary" />
               </div>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
+              <CardTitle>Guided Questionnaire</CardTitle>
+            </div>
+            <CardDescription>
+              Step-by-step questionnaire that collects detailed information about your facility
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                <p className="text-sm">6-step comprehensive assessment</p>
+              </div>
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                <p className="text-sm">Facility-specific hazard selection</p>
+              </div>
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                <p className="text-sm">Compliance framework integration</p>
+              </div>
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                <p className="text-sm">More accurate and detailed plans</p>
+              </div>
+            </div>
+
+            <Button
+              className="w-full"
+              size="lg"
+              onClick={() => router.push(`/onboarding-new?orgId=${orgId}`)}
+            >
+              Start Questionnaire
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+
+            <p className="text-xs text-muted-foreground text-center">
+              Takes about 10-15 minutes
+            </p>
+          </CardContent>
+        </Card>
+
+        {/* Quick Plan - Manual */}
+        <Card className="hover:shadow-md transition-shadow">
+          <CardHeader>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 rounded-lg bg-muted">
+                <Sparkles className="h-6 w-6 text-muted-foreground" />
+              </div>
+              <CardTitle>Quick Plan</CardTitle>
+            </div>
+            <CardDescription>
+              Describe your needs in text and let AI generate a plan
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                <p className="text-sm text-muted-foreground">Simple text description</p>
+              </div>
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                <p className="text-sm text-muted-foreground">AI-generated content</p>
+              </div>
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                <p className="text-sm text-muted-foreground">Fast and flexible</p>
+              </div>
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                <p className="text-sm text-muted-foreground">Less structured output</p>
+              </div>
+            </div>
+
+            <Button
+              variant="outline"
+              className="w-full"
+              size="lg"
+              onClick={() => router.push(`/${orgId}/plans/quick`)}
+            >
+              Create Quick Plan
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+
+            <p className="text-xs text-muted-foreground text-center">
+              Takes about 2-3 minutes
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="flex justify-center">
+        <Button
+          variant="ghost"
+          onClick={() => router.back()}
+        >
+          Cancel
+        </Button>
+      </div>
     </div>
   );
 }

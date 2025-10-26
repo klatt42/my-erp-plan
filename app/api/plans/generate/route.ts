@@ -13,6 +13,7 @@ import { createServerClient } from "@/lib/supabase/service-role";
 import { NextResponse } from "next/server";
 import { generateERP } from "@/lib/anthropic/client";
 import type { FacilityProfile } from "@/lib/anthropic/types";
+import { getFacilityResearch } from "@/app/actions/research-facility";
 
 export async function POST(request: Request) {
   console.log("[/api/plans/generate] POST request received");
@@ -87,6 +88,16 @@ export async function POST(request: Request) {
 
       orgId = memberships[0].org_id;
       console.log(`[/api/plans/generate] Using first organization (fallback): ${orgId}`);
+    }
+
+    // Fetch facility research data if available
+    const facilityResearch = await getFacilityResearch(orgId);
+    if (facilityResearch) {
+      console.log(`[/api/plans/generate] Including facility research data from ${facilityResearch.researched_at}`);
+      // Attach research data to facility profile for AI prompts
+      (facilityProfile as any).facilityResearch = facilityResearch;
+    } else {
+      console.log("[/api/plans/generate] No facility research data available");
     }
 
     // Generate ERP using Claude 4

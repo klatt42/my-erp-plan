@@ -63,14 +63,24 @@
   .prose table {
     @apply w-full border-collapse;
     border-spacing: 0;
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  @media (min-width: 768px) {
+    .prose table {
+      display: table;
+      white-space: normal;
+    }
   }
 
   .prose th {
-    @apply border border-border bg-muted px-4 py-2 text-left font-semibold;
+    @apply border border-border bg-muted px-2 md:px-4 py-1.5 md:py-2 text-left font-semibold text-xs md:text-sm;
   }
 
   .prose td {
-    @apply border border-border px-4 py-2;
+    @apply border border-border px-2 md:px-4 py-1.5 md:py-2 text-xs md:text-sm;
   }
 
   .prose thead tr {
@@ -91,21 +101,47 @@
 
   /* Section headers */
   .prose h2 {
-    @apply bg-gradient-to-r from-primary/20 to-primary/10 border-l-4 border-primary px-4 py-3 rounded-r-md mt-8 mb-4;
+    @apply bg-gradient-to-r from-primary/20 to-primary/10 border-l-4 border-primary px-2 md:px-4 py-2 md:py-3 rounded-r-md mt-6 md:mt-8 mb-3 md:mb-4 text-base md:text-xl;
   }
 
   .prose h3 {
-    @apply bg-gradient-to-r from-primary/15 to-primary/5 border-l-2 border-primary/60 px-3 py-2 rounded-r-md mt-6 mb-3;
+    @apply bg-gradient-to-r from-primary/15 to-primary/5 border-l-2 border-primary/60 px-2 md:px-3 py-1.5 md:py-2 rounded-r-md mt-4 md:mt-6 mb-2 md:mb-3 text-sm md:text-lg;
   }
 
   .prose h4 {
-    @apply bg-primary/10 border-l-2 border-primary/40 px-3 py-1.5 rounded-r-sm mt-4 mb-2;
+    @apply bg-primary/10 border-l-2 border-primary/40 px-2 md:px-3 py-1 md:py-1.5 rounded-r-sm mt-3 md:mt-4 mb-1.5 md:mb-2 text-sm md:text-base;
   }
 
   /* Improve heading text appearance */
   .prose h2,
   .prose h3,
   .prose h4 {
-    @apply font-semibold text-foreground;
+    @apply font-semibold text-foreground break-words;
+  }
+
+  /* Mobile-friendly prose adjustments */
+  .prose p {
+    @apply text-sm md:text-base leading-relaxed break-words;
+  }
+
+  .prose ul, .prose ol {
+    @apply text-sm md:text-base pl-4 md:pl-6;
+  }
+
+  .prose li {
+    @apply mb-1 md:mb-2 break-words;
+  }
+
+  .prose strong {
+    @apply font-semibold;
+  }
+
+  /* Code blocks and pre */
+  .prose pre {
+    @apply overflow-x-auto text-xs md:text-sm;
+  }
+
+  .prose code {
+    @apply text-xs md:text-sm break-all;
   }
 }

@@ -1,5 +1,22 @@
 {
-  "node": {},
+  "node": {
+    "8238a61199975d2a8d0431b6c76722686cce385e": {
+      "workers": {
+        "app/(dashboard)/[orgId]/settings/page": "(rsc)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22%2Fhome%2Fklatt42%2Fprojects%2Fgenesis-skills-test%2Fmy-erp-plan%2Fapp%2Factions%2Fresearch-facility.ts%22%2C%5B%22researchFacilityData%22%2C%22getFacilityResearch%22%5D%5D%5D&__client_imported__=!"
+      },
+      "layer": {
+        "app/(dashboard)/[orgId]/settings/page": "rsc"
+      }
+    },
+    "ed6f2d9504ef96533bc3b2f52920be7078a04494": {
+      "workers": {
+        "app/(dashboard)/[orgId]/settings/page": "(rsc)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22%2Fhome%2Fklatt42%2Fprojects%2Fgenesis-skills-test%2Fmy-erp-plan%2Fapp%2Factions%2Fresearch-facility.ts%22%2C%5B%22researchFacilityData%22%2C%22getFacilityResearch%22%5D%5D%5D&__client_imported__=!"
+      },
+      "layer": {
+        "app/(dashboard)/[orgId]/settings/page": "rsc"
+      }
+    }
+  },
   "edge": {},
-  "encryptionKey": "NNf6Gxc3+vJEULBKpgA9qX1HNbaMUb0z00ddTTMfsEU="
+  "encryptionKey": "RKAvwebmFofx2sIoiPgawD4oeStMsE67DwNZcnBVzDo="
 }

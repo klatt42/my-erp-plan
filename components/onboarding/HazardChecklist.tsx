@@ -331,11 +331,24 @@ export function HazardChecklist({
                   >
                     <CardContent className="p-4">
                       <div className="flex items-start gap-3">
-                        <Checkbox
-                          checked={isSelected}
-                          onCheckedChange={() => handleToggle(option.value)}
-                          onClick={(e) => e.stopPropagation()}
-                        />
+                        <div className={cn(
+                          "h-4 w-4 rounded border-2 flex-shrink-0 mt-0.5 transition-colors",
+                          isSelected
+                            ? "bg-primary border-primary"
+                            : "border-muted-foreground/30"
+                        )}>
+                          {isSelected && (
+                            <svg
+                              className="h-full w-full text-primary-foreground"
+                              viewBox="0 0 16 16"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="3"
+                            >
+                              <polyline points="3,8 6,11 13,4" />
+                            </svg>
+                          )}
+                        </div>
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
                             <Icon className="h-4 w-4 text-muted-foreground" />

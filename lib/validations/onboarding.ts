@@ -158,6 +158,46 @@ export const teamStructureSchema = z.object({
   accessibilityDetails: z.string().optional(),
   multilingualNeeds: z.array(z.string()).optional(),
   specialConsiderations: z.array(z.string()).optional(),
+  // Internal Emergency Contacts
+  emergencyCoordinator: z
+    .object({
+      name: z.string().min(1, "Emergency Coordinator name is required"),
+      title: z.string().min(1, "Title is required"),
+      phone: z
+        .string()
+        .regex(
+          /^(\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$/,
+          "Invalid phone number format"
+        ),
+      email: z.string().email("Invalid email address"),
+    })
+    .required(),
+  alternateContact: z
+    .object({
+      name: z.string().optional(),
+      title: z.string().optional(),
+      phone: z
+        .string()
+        .regex(
+          /^(\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$/,
+          "Invalid phone number format"
+        )
+        .optional(),
+      email: z.string().email("Invalid email address").optional(),
+    })
+    .optional(),
+  facilityManager: z
+    .object({
+      name: z.string().optional(),
+      phone: z
+        .string()
+        .regex(
+          /^(\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$/,
+          "Invalid phone number format"
+        )
+        .optional(),
+    })
+    .optional(),
 });
 
 export type TeamStructure = z.infer<typeof teamStructureSchema>;
@@ -282,6 +322,22 @@ export function getStepDefaults(step: number): any {
         accessibilityNeeds: false,
         multilingualNeeds: [],
         specialConsiderations: [],
+        emergencyCoordinator: {
+          name: "",
+          title: "",
+          phone: "",
+          email: "",
+        },
+        alternateContact: {
+          name: "",
+          title: "",
+          phone: "",
+          email: "",
+        },
+        facilityManager: {
+          name: "",
+          phone: "",
+        },
       };
     case 6:
       return {
@@ -345,6 +401,11 @@ export function onboardingToFacilityProfile(
     compliance: data.step6.compliance,
     customCompliance: data.step6.customCompliance,
     emergencyContacts: {
+      // Internal contacts from Step 5
+      emergencyCoordinator: data.step5.emergencyCoordinator,
+      alternateContact: data.step5.alternateContact,
+      facilityManager: data.step5.facilityManager,
+      // External support services from Step 6
       mitigationContractor: data.step6.mitigationContractor,
       mitigationContractorPhone: data.step6.mitigationContractorPhone,
       mitigationContractorContact: data.step6.mitigationContractorContact,
