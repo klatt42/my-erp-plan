@@ -1,4 +1,4 @@
-import pdfParse from 'pdf-parse';
+import pdfParse from 'pdf-parse-fork';
 import mammoth from 'mammoth';
 import * as XLSX from 'xlsx';
 
