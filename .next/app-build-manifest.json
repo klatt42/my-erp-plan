@@ -50,6 +50,26 @@
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/(dashboard)/[orgId]/plans/new/page.js"
+    ],
+    "/(dashboard)/[orgId]/resources/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(dashboard)/[orgId]/resources/page.js"
+    ],
+    "/(dashboard)/[orgId]/resources/personnel/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(dashboard)/[orgId]/resources/personnel/page.js"
+    ],
+    "/(dashboard)/[orgId]/team/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(dashboard)/[orgId]/team/page.js"
+    ],
+    "/(dashboard)/[orgId]/plans/[planId]/emergency-mode/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(dashboard)/[orgId]/plans/[planId]/emergency-mode/page.js"
     ]
   }
 }

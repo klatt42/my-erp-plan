@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileText, Users, Package, AlertCircle } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { StatsCard } from "@/components/dashboard/StatsCard";
 
 export default async function OrgDashboardPage({
   params,
@@ -31,25 +32,25 @@ export default async function OrgDashboardPage({
     {
       title: "Emergency Plans",
       value: plansResult.count || 0,
-      icon: FileText,
+      icon: "FileText" as const,
       href: `/${params.orgId}/plans`,
     },
     {
       title: "Resources",
       value: resourcesResult.count || 0,
-      icon: Package,
+      icon: "Package" as const,
       href: `/${params.orgId}/resources`,
     },
     {
       title: "Team Members",
       value: membersResult.count || 0,
-      icon: Users,
+      icon: "Users" as const,
       href: `/${params.orgId}/team`,
     },
     {
       title: "Active Incidents",
       value: 0,
-      icon: AlertCircle,
+      icon: "AlertCircle" as const,
       href: `/${params.orgId}/incidents`,
     },
   ];
@@ -72,64 +73,86 @@ export default async function OrgDashboardPage({
       </div>
 
       {/* Stats Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => (
-          <Link key={stat.title} href={stat.href}>
-            <Card className="hover:shadow-md transition-shadow cursor-pointer">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  {stat.title}
-                </CardTitle>
-                <stat.icon className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stat.value}</div>
-              </CardContent>
-            </Card>
-          </Link>
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        {stats.map((stat, index) => (
+          <StatsCard
+            key={stat.title}
+            title={stat.title}
+            value={stat.value}
+            icon={stat.icon}
+            href={stat.href}
+            index={index}
+          />
         ))}
       </div>
 
       {/* Recent Plans */}
-      <Card>
+      <Card className="border-gray-200/50 dark:border-gray-700/50 shadow-glass backdrop-blur-xl bg-gradient-to-br from-white/90 to-white/60 dark:from-gray-800/90 dark:to-gray-900/60">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>Recent Emergency Plans</CardTitle>
-            <Button asChild variant="outline" size="sm">
+            <CardTitle className="text-xl">Recent Emergency Plans</CardTitle>
+            <Button asChild variant="outline" size="sm" className="backdrop-blur-sm">
               <Link href={`/${params.orgId}/plans`}>View all</Link>
             </Button>
           </div>
         </CardHeader>
         <CardContent>
           {recentPlans && recentPlans.length > 0 ? (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {recentPlans.map((plan) => (
-                <div
+                <Link
                   key={plan.id}
-                  className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0"
+                  href={`/${params.orgId}/plans/${plan.id}`}
+                  className="flex items-center justify-between p-4 rounded-lg border border-gray-200/50 dark:border-gray-700/50 hover:border-primary/30 hover:bg-primary/5 transition-all duration-200 group"
                 >
-                  <div>
-                    <p className="font-medium">Version {plan.version}</p>
-                    <p className="text-sm text-muted-foreground">
-                      Status: {plan.status}
-                    </p>
+                  <div className="flex items-center gap-4">
+                    <div className="relative">
+                      <div className="absolute inset-0 bg-primary/20 rounded-full blur-md" />
+                      <div className="relative rounded-full bg-primary/10 p-3">
+                        <FileText className="h-5 w-5 text-primary" />
+                      </div>
+                    </div>
+                    <div>
+                      <p className="font-medium group-hover:text-primary transition-colors">
+                        Version {plan.version}
+                      </p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span
+                          className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
+                            plan.status === "active"
+                              ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                              : plan.status === "draft"
+                                ? "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
+                                : "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400"
+                          }`}
+                        >
+                          {plan.status}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {new Date(plan.created_at).toLocaleDateString()}
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                  <Button asChild variant="ghost" size="sm">
-                    <Link href={`/${params.orgId}/plans/${plan.id}`}>
-                      View
-                    </Link>
+                  <Button variant="ghost" size="sm" className="opacity-0 group-hover:opacity-100 transition-opacity">
+                    View →
                   </Button>
-                </div>
+                </Link>
               ))}
             </div>
           ) : (
-            <div className="text-center py-8">
-              <FileText className="mx-auto h-12 w-12 text-muted-foreground" />
-              <h3 className="mt-4 text-lg font-medium">No plans yet</h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Get started by creating your first emergency plan
+            <div className="text-center py-12">
+              <div className="relative inline-block">
+                <div className="absolute inset-0 bg-primary/20 rounded-full blur-2xl" />
+                <div className="relative rounded-full bg-primary/10 p-6">
+                  <FileText className="h-12 w-12 text-primary" />
+                </div>
+              </div>
+              <h3 className="mt-6 text-lg font-medium">No plans yet</h3>
+              <p className="mt-2 text-sm text-muted-foreground max-w-sm mx-auto">
+                Get started by creating your first emergency response plan
               </p>
-              <Button asChild className="mt-4">
+              <Button asChild className="mt-6">
                 <Link href={`/${params.orgId}/plans/new`}>Create plan</Link>
               </Button>
             </div>
