@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DocumentUpload } from "@/components/documents/DocumentUpload";
 import { FileText, Upload } from "lucide-react";
+import Link from "next/link";
 
 export default async function DocumentsPage({
   params,
@@ -67,9 +68,10 @@ export default async function DocumentsPage({
           {documents && documents.length > 0 ? (
             <div className="space-y-3">
               {documents.map((doc) => (
-                <div
+                <Link
                   key={doc.id}
-                  className="flex items-center justify-between p-4 rounded-lg border border-gray-200/50 dark:border-gray-700/50 hover:border-primary/30 hover:bg-primary/5 transition-all duration-200"
+                  href={`/${params.orgId}/documents/${doc.id}`}
+                  className="flex items-center justify-between p-4 rounded-lg border border-gray-200/50 dark:border-gray-700/50 hover:border-primary/30 hover:bg-primary/5 transition-all duration-200 cursor-pointer"
                 >
                   <div className="flex items-center gap-4">
                     <div className="relative">
@@ -105,7 +107,7 @@ export default async function DocumentsPage({
                       </div>
                     </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           ) : (
