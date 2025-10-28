@@ -14,6 +14,7 @@ import {
   ShieldCheck,
   ChevronLeft,
   ChevronRight,
+  FolderOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -25,6 +26,7 @@ interface SidebarProps {
 const navigation = [
   { name: "Dashboard", href: "", icon: LayoutDashboard },
   { name: "Emergency Plans", href: "/plans", icon: FileText },
+  { name: "Documents", href: "/documents", icon: FolderOpen },
   { name: "Resources", href: "/resources", icon: Package },
   { name: "Team", href: "/team", icon: Users },
   { name: "Settings", href: "/settings", icon: Settings },

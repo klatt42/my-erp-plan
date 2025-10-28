@@ -1,7 +1,7 @@
 {
+  "/page": "app/page.js",
   "/(dashboard)/[orgId]/plans/page": "app/(dashboard)/[orgId]/plans/page.js",
-  "/(dashboard)/[orgId]/page": "app/(dashboard)/[orgId]/page.js",
-  "/(dashboard)/[orgId]/resources/personnel/page": "app/(dashboard)/[orgId]/resources/personnel/page.js",
   "/(dashboard)/[orgId]/plans/[planId]/page": "app/(dashboard)/[orgId]/plans/[planId]/page.js",
-  "/(dashboard)/[orgId]/plans/[planId]/emergency-mode/page": "app/(dashboard)/[orgId]/plans/[planId]/emergency-mode/page.js"
+  "/(dashboard)/[orgId]/documents/page": "app/(dashboard)/[orgId]/documents/page.js",
+  "/(dashboard)/[orgId]/documents/[documentId]/page": "app/(dashboard)/[orgId]/documents/[documentId]/page.js"
 }

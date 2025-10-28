@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { ArrowLeft, FileText, Users, Package, ClipboardList, Building2, Download, CheckCircle2, AlertCircle } from "lucide-react";
 import Link from "next/link";
-import { ApplyToEmergencyPlanButton } from "@/components/documents/ApplyToEmergencyPlanButton";
+import { ApplyToEmergencyPlanDialog } from "@/components/documents/ApplyToEmergencyPlanDialog";
 
 export default async function DocumentDetailsPage({
   params,
@@ -124,13 +124,16 @@ export default async function DocumentDetailsPage({
             </div>
 
             <div className="flex gap-2">
-              <ApplyToEmergencyPlanButton
+              <ApplyToEmergencyPlanDialog
                 documentId={document.id}
                 orgId={params.orgId}
                 hasContacts={contacts.length > 0}
                 hasProcedures={procedures.length > 0}
                 hasFacilityInfo={!!facilityInfo}
                 hasEquipment={equipment.length > 0}
+                contactsCount={contacts.length}
+                proceduresCount={procedures.length}
+                equipmentCount={equipment.length}
               />
             </div>
           </div>

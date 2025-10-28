@@ -11,65 +11,40 @@
       "static/chunks/main-app.js",
       "static/chunks/app/(dashboard)/layout.js"
     ],
-    "/(dashboard)/[orgId]/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(dashboard)/[orgId]/page.js"
-    ],
     "/(dashboard)/[orgId]/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/(dashboard)/[orgId]/layout.js"
-    ],
-    "/(dashboard)/[orgId]/settings/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(dashboard)/[orgId]/settings/page.js"
     ],
     "/(dashboard)/[orgId]/plans/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/(dashboard)/[orgId]/plans/page.js"
     ],
+    "/(dashboard)/[orgId]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(dashboard)/[orgId]/page.js"
+    ],
     "/(dashboard)/[orgId]/plans/[planId]/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/(dashboard)/[orgId]/plans/[planId]/page.js"
     ],
-    "/(dashboard)/[orgId]/plans/[planId]/edit/page": [
+    "/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(dashboard)/[orgId]/plans/[planId]/edit/page.js"
+      "static/chunks/app/page.js"
     ],
-    "/(dashboard)/onboarding/page": [
+    "/(dashboard)/[orgId]/documents/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(dashboard)/onboarding/page.js"
+      "static/chunks/app/(dashboard)/[orgId]/documents/page.js"
     ],
-    "/(dashboard)/[orgId]/plans/new/page": [
+    "/(dashboard)/[orgId]/documents/[documentId]/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(dashboard)/[orgId]/plans/new/page.js"
-    ],
-    "/(dashboard)/[orgId]/resources/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(dashboard)/[orgId]/resources/page.js"
-    ],
-    "/(dashboard)/[orgId]/resources/personnel/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(dashboard)/[orgId]/resources/personnel/page.js"
-    ],
-    "/(dashboard)/[orgId]/team/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(dashboard)/[orgId]/team/page.js"
-    ],
-    "/(dashboard)/[orgId]/plans/[planId]/emergency-mode/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(dashboard)/[orgId]/plans/[planId]/emergency-mode/page.js"
+      "static/chunks/app/(dashboard)/[orgId]/documents/[documentId]/page.js"
     ]
   }
 }
