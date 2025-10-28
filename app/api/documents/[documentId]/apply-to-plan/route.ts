@@ -82,28 +82,35 @@ export async function POST(
     // Get or create active plan for this organization
     const serviceSupabase = createServerClient();
 
-    let { data: activePlan } = await supabase
+    // First try to find an active plan
+    let { data: activePlans, error: activeError } = await supabase
       .from("emergency_plans")
       .select("*")
       .eq("org_id", orgId)
-      .eq("status", "active")
-      .single();
+      .eq("status", "active");
+
+    console.log(`[/api/documents/${documentId}/apply-to-plan] Found ${activePlans?.length || 0} active plans`);
+
+    let activePlan = activePlans?.[0] || null;
 
     // If no active plan, get the most recent draft
     if (!activePlan) {
-      const { data: draftPlan } = await supabase
+      console.log(`[/api/documents/${documentId}/apply-to-plan] No active plan, looking for draft...`);
+
+      const { data: draftPlans, error: draftError } = await supabase
         .from("emergency_plans")
         .select("*")
         .eq("org_id", orgId)
         .eq("status", "draft")
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .single();
+        .order("created_at", { ascending: false });
 
-      activePlan = draftPlan;
+      console.log(`[/api/documents/${documentId}/apply-to-plan] Found ${draftPlans?.length || 0} draft plans`);
+
+      activePlan = draftPlans?.[0] || null;
     }
 
     if (!activePlan) {
+      console.error(`[/api/documents/${documentId}/apply-to-plan] No plan found for org ${orgId}`);
       return NextResponse.json(
         {
           error: "No active or draft plan found. Please create an emergency plan first.",
@@ -111,6 +118,17 @@ export async function POST(
         },
         { status: 404 }
       );
+    }
+
+    // If there are multiple active plans, archive all but the first one
+    if (activePlans && activePlans.length > 1) {
+      console.log(`[/api/documents/${documentId}/apply-to-plan] WARNING: Found ${activePlans.length} active plans, archiving extras`);
+
+      const idsToArchive = activePlans.slice(1).map(p => p.id);
+      await serviceSupabase
+        .from("emergency_plans")
+        .update({ status: "archived" } as any)
+        .in("id", idsToArchive);
     }
 
     console.log(`[/api/documents/${documentId}/apply-to-plan] Applying to plan: ${activePlan.id}`);

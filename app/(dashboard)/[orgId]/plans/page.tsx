@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { createServerClient } from "@/lib/supabase/service-role";
 import { PlanCard } from "@/components/plans/plan-card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -16,6 +17,29 @@ export default async function PlansPage({
     .select("*")
     .eq("org_id", params.orgId)
     .order("created_at", { ascending: false });
+
+  // Check for multiple active plans and fix them
+  const activePlans = plans?.filter(p => p.status === "active") || [];
+  if (activePlans.length > 1) {
+    console.log(`[PlansPage] WARNING: Found ${activePlans.length} active plans for org ${params.orgId}, fixing...`);
+
+    const serviceSupabase = createServerClient();
+
+    // Keep the most recently activated plan active, archive the rest
+    const sortedActive = activePlans.sort((a, b) =>
+      new Date(b.activated_at || b.created_at).getTime() -
+      new Date(a.activated_at || a.created_at).getTime()
+    );
+
+    const idsToArchive = sortedActive.slice(1).map(p => p.id);
+
+    await serviceSupabase
+      .from("emergency_plans")
+      .update({ status: "archived" } as any)
+      .in("id", idsToArchive);
+
+    console.log(`[PlansPage] Archived ${idsToArchive.length} extra active plans`);
+  }
 
   return (
     <div className="space-y-6">
