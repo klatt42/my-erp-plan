@@ -112,9 +112,9 @@ export async function POST(request: Request) {
         mime_type: file.type,
         storage_path: storagePath,
         status: "processing",
-      })
+      } as any)
       .select()
-      .single();
+      .single() as any;
 
     if (docError || !document) {
       console.error("[/api/documents/upload] Database insert error:", docError);
@@ -182,7 +182,7 @@ async function processDocumentAsync(
         document_type: extraction.classification.documentType,
         confidence_score: extraction.classification.confidence,
         processed_at: new Date().toISOString(),
-      })
+      } as any)
       .eq("id", documentId);
 
     if (updateError) {
@@ -244,7 +244,7 @@ async function processDocumentAsync(
     if (extractionRecords.length > 0) {
       const { error: extractionError } = await supabase
         .from("document_extractions")
-        .insert(extractionRecords);
+        .insert(extractionRecords as any);
 
       if (extractionError) {
         console.error("[processDocumentAsync] Extraction insert error:", extractionError);
@@ -262,7 +262,7 @@ async function processDocumentAsync(
         status: "failed",
         processing_error: error instanceof Error ? error.message : "Unknown error",
         processed_at: new Date().toISOString(),
-      })
+      } as any)
       .eq("id", documentId);
   }
 }

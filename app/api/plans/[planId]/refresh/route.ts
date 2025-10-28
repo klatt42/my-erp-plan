@@ -99,7 +99,7 @@ export async function POST(
         const tableRows = facilityContactsMatch[1].trim().split('\n');
 
         for (const row of tableRows) {
-          const cells = row.split('|').map(c => c.trim()).filter(c => c);
+          const cells = row.split('|').map((c: string) => c.trim()).filter((c: string) => c);
 
           if (cells.length >= 2) {
             const role = cells[0]?.toLowerCase() || '';
@@ -144,8 +144,9 @@ export async function POST(
       .single();
 
     // Initialize emergency contacts object
-    if (!facilityProfile.emergencyContacts) {
-      (facilityProfile as any).emergencyContacts = {};
+    const profile = facilityProfile as any;
+    if (!profile.emergencyContacts) {
+      profile.emergencyContacts = {};
     }
 
     // STEP 3: Merge contacts - Priority: Onboarding > Preserved Edits
@@ -157,48 +158,48 @@ export async function POST(
       // Update with latest internal contacts from Step 5
       if (onboardingData.step5) {
         if (onboardingData.step5.emergencyCoordinator) {
-          (facilityProfile as any).emergencyContacts.emergencyCoordinator = onboardingData.step5.emergencyCoordinator;
+          profile.emergencyContacts.emergencyCoordinator = onboardingData.step5.emergencyCoordinator;
           console.log(`[/api/plans/${planId}/refresh] Using Emergency Coordinator from onboarding: ${onboardingData.step5.emergencyCoordinator.name}`);
         }
         if (onboardingData.step5.alternateContact) {
-          (facilityProfile as any).emergencyContacts.alternateContact = onboardingData.step5.alternateContact;
+          profile.emergencyContacts.alternateContact = onboardingData.step5.alternateContact;
         }
         if (onboardingData.step5.facilityManager) {
-          (facilityProfile as any).emergencyContacts.facilityManager = onboardingData.step5.facilityManager;
+          profile.emergencyContacts.facilityManager = onboardingData.step5.facilityManager;
         }
       }
 
       // Update with latest support services from Step 6
       if (onboardingData.step6) {
         if (onboardingData.step6.mitigationContractor) {
-          (facilityProfile as any).emergencyContacts.mitigationContractor = onboardingData.step6.mitigationContractor;
+          profile.emergencyContacts.mitigationContractor = onboardingData.step6.mitigationContractor;
         }
         if (onboardingData.step6.mitigationContractorPhone) {
-          (facilityProfile as any).emergencyContacts.mitigationContractorPhone = onboardingData.step6.mitigationContractorPhone;
+          profile.emergencyContacts.mitigationContractorPhone = onboardingData.step6.mitigationContractorPhone;
         }
         if (onboardingData.step6.mitigationContractorContact) {
-          (facilityProfile as any).emergencyContacts.mitigationContractorContact = onboardingData.step6.mitigationContractorContact;
+          profile.emergencyContacts.mitigationContractorContact = onboardingData.step6.mitigationContractorContact;
         }
         if (onboardingData.step6.specialtyContentsContractor) {
-          (facilityProfile as any).emergencyContacts.specialtyContentsContractor = onboardingData.step6.specialtyContentsContractor;
+          profile.emergencyContacts.specialtyContentsContractor = onboardingData.step6.specialtyContentsContractor;
         }
         if (onboardingData.step6.specialtyContentsContractorPhone) {
-          (facilityProfile as any).emergencyContacts.specialtyContentsContractorPhone = onboardingData.step6.specialtyContentsContractorPhone;
+          profile.emergencyContacts.specialtyContentsContractorPhone = onboardingData.step6.specialtyContentsContractorPhone;
         }
         if (onboardingData.step6.specialtyContentsContractorContact) {
-          (facilityProfile as any).emergencyContacts.specialtyContentsContractorContact = onboardingData.step6.specialtyContentsContractorContact;
+          profile.emergencyContacts.specialtyContentsContractorContact = onboardingData.step6.specialtyContentsContractorContact;
         }
       }
     }
 
     // STEP 4: Use preserved manual edits if onboarding data doesn't exist
-    if (!(facilityProfile as any).emergencyContacts.emergencyCoordinator && preservedEmergencyCoordinator) {
-      (facilityProfile as any).emergencyContacts.emergencyCoordinator = preservedEmergencyCoordinator;
+    if (!profile.emergencyContacts.emergencyCoordinator && preservedEmergencyCoordinator) {
+      profile.emergencyContacts.emergencyCoordinator = preservedEmergencyCoordinator;
       console.log(`[/api/plans/${planId}/refresh] Using preserved Emergency Coordinator from manual edits`);
     }
 
-    if (!(facilityProfile as any).emergencyContacts.facilityManager && preservedFacilityManager) {
-      (facilityProfile as any).emergencyContacts.facilityManager = preservedFacilityManager;
+    if (!profile.emergencyContacts.facilityManager && preservedFacilityManager) {
+      profile.emergencyContacts.facilityManager = preservedFacilityManager;
       console.log(`[/api/plans/${planId}/refresh] Using preserved Facility Manager from manual edits`);
     }
 
@@ -206,7 +207,7 @@ export async function POST(
     const facilityResearch = await getFacilityResearch(existingPlan.org_id);
     if (facilityResearch) {
       console.log(`[/api/plans/${planId}/refresh] Including latest facility research data from ${facilityResearch.researched_at}`);
-      (facilityProfile as any).facilityResearch = facilityResearch;
+      profile.facilityResearch = facilityResearch;
     } else {
       console.log(`[/api/plans/${planId}/refresh] No facility research data available`);
     }
@@ -248,7 +249,7 @@ export async function POST(
       // Update existing draft plan
       console.log(`[/api/plans/${planId}/refresh] Updating existing draft plan`);
 
-      const { data: updatedPlan, error: updateError } = await serviceSupabase
+      const { data: updatedPlan, error: updateError } = (await serviceSupabase
         .from("emergency_plans")
         .update({
           content_json: {
@@ -262,10 +263,10 @@ export async function POST(
             refreshedAt: new Date().toISOString(),
           },
           updated_at: new Date().toISOString(),
-        })
+        } as any)
         .eq("id", planId)
         .select()
-        .single();
+        .single()) as any;
 
       if (updateError) {
         console.error(`[/api/plans/${planId}/refresh] Database update error:`, updateError);
@@ -303,7 +304,7 @@ export async function POST(
       const newMinorVersion = parseInt(versionParts[1] || "0") + 1;
       const newVersion = `${versionParts[0]}.${newMinorVersion}.0`;
 
-      const { data: newPlan, error: createError } = await serviceSupabase
+      const { data: newPlan, error: createError } = (await serviceSupabase
         .from("emergency_plans")
         .insert({
           org_id: existingPlan.org_id,
@@ -321,9 +322,9 @@ export async function POST(
             refreshedAt: new Date().toISOString(),
           },
           created_by: user.id,
-        })
+        } as any)
         .select()
-        .single();
+        .single()) as any;
 
       if (createError) {
         console.error(`[/api/plans/${planId}/refresh] Database insert error:`, createError);
