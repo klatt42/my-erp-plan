@@ -22,6 +22,28 @@ interface ExtractionResult {
 }
 
 /**
+ * Extract JSON from Claude response, handling markdown code blocks
+ */
+function extractJSON(text: string): any {
+  // Remove markdown code blocks if present
+  let cleaned = text.trim();
+
+  // Remove ```json ... ``` or ``` ... ```
+  const codeBlockMatch = cleaned.match(/```(?:json)?\s*\n?([\s\S]*?)\n?```/);
+  if (codeBlockMatch) {
+    cleaned = codeBlockMatch[1].trim();
+  }
+
+  // Find JSON object or array
+  const jsonMatch = cleaned.match(/(\{[\s\S]*\}|\[[\s\S]*\])/);
+  if (jsonMatch) {
+    cleaned = jsonMatch[1];
+  }
+
+  return JSON.parse(cleaned);
+}
+
+/**
  * Classify document type using Claude
  */
 export async function classifyDocument(text: string): Promise<{
@@ -59,7 +81,8 @@ Respond ONLY with valid JSON in this exact format:
     });
 
     const responseText = message.content[0].type === "text" ? message.content[0].text : "";
-    const result = JSON.parse(responseText);
+    console.log(`[classifyDocument] Raw response: ${responseText.substring(0, 200)}`);
+    const result = extractJSON(responseText);
 
     console.log(`[classifyDocument] Result: ${result.documentType} (confidence: ${result.confidence})`);
 
@@ -111,7 +134,7 @@ If no contacts are found, return {"contacts": []}.`;
     });
 
     const responseText = message.content[0].type === "text" ? message.content[0].text : "";
-    const result = JSON.parse(responseText);
+    const result = extractJSON(responseText);
 
     const tokensUsed = message.usage.input_tokens + message.usage.output_tokens;
 
@@ -170,7 +193,7 @@ If no equipment is found, return {"equipment": []}.`;
     });
 
     const responseText = message.content[0].type === "text" ? message.content[0].text : "";
-    const result = JSON.parse(responseText);
+    const result = extractJSON(responseText);
 
     const tokensUsed = message.usage.input_tokens + message.usage.output_tokens;
 
@@ -234,7 +257,7 @@ If no facility info is found, return {"facility": null}.`;
     });
 
     const responseText = message.content[0].type === "text" ? message.content[0].text : "";
-    const result = JSON.parse(responseText);
+    const result = extractJSON(responseText);
 
     const tokensUsed = message.usage.input_tokens + message.usage.output_tokens;
 
@@ -294,7 +317,7 @@ If no procedures are found, return {"procedures": []}.`;
     });
 
     const responseText = message.content[0].type === "text" ? message.content[0].text : "";
-    const result = JSON.parse(responseText);
+    const result = extractJSON(responseText);
 
     const tokensUsed = message.usage.input_tokens + message.usage.output_tokens;
 
