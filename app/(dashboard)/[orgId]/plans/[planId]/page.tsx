@@ -14,6 +14,8 @@ import { CreateVersionButton } from "@/components/plans/CreateVersionButton";
 import { SectionNavigation } from "@/components/plans/SectionNavigation";
 import { SelectiveExportMenu } from "@/components/plans/SelectiveExportMenu";
 import RefreshPlanButton from "@/components/plans/RefreshPlanButton";
+import { PlanChatEditor } from "@/components/plans/PlanChatEditor";
+import { SelectionEditButton } from "@/components/plans/SelectionEditButton";
 
 interface ERPSection {
   title: string;
@@ -260,6 +262,14 @@ export default async function PlanDetailPage({
           sections={content.sections!}
           executiveSummary={content.executiveSummary}
         />
+      )}
+
+      {/* AI Chat Editor - Only show for admin and editor roles */}
+      {(userRole === "admin" || userRole === "editor") && (
+        <>
+          <SelectionEditButton />
+          <PlanChatEditor planId={params.planId} orgId={params.orgId} />
+        </>
       )}
     </div>
   );
