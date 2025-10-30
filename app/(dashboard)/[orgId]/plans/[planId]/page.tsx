@@ -16,6 +16,7 @@ import { SelectiveExportMenu } from "@/components/plans/SelectiveExportMenu";
 import RefreshPlanButton from "@/components/plans/RefreshPlanButton";
 import { PlanChatEditor } from "@/components/plans/PlanChatEditor";
 import { SelectionEditButton } from "@/components/plans/SelectionEditButton";
+import { VersionHistory } from "@/components/plans/VersionHistory";
 
 interface ERPSection {
   title: string;
@@ -238,6 +239,13 @@ export default async function PlanDetailPage({
           </CardContent>
         </Card>
       )}
+
+      {/* Version History */}
+      <VersionHistory
+        planId={params.planId}
+        orgId={params.orgId}
+        currentVersion={content.version || plan.version}
+      />
 
       {/* Metadata Footer */}
       {content.generatedAt && (
